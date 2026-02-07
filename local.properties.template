@@ -1,0 +1,4 @@
+# TEMPLATE - Copy this to local.properties and replace the value with your Plant.id API key.
+# Do NOT commit your real local.properties to version control.
+
+PLANT_ID_API_KEY=your_plant_id_api_key_here
