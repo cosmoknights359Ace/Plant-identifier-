@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Plant Identifier — Personal Botanical Space &amp; Care Guide</title>
+  <meta name="description" content="Identify houseplants, flowers, and trees with a zero-login Personal Garden Space that stores your uploaded photos, notes, and interests locally and syncs to a desktop folder." />
+  <meta property="og:title" content="Plant Identifier — Personal Botanical Space &amp; Care Guide" />
+  <meta property="og:description" content="Identify houseplants, flowers, and trees with a zero-login Personal Garden Space that stores your uploaded photos, notes, and interests locally and syncs to a desktop folder." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Strict 3-Zone Top Bar Contract -->
+  <header class="topbar">
+    <a href="#identifier" class="brand-wordmark">Verdant Plant ID</a>
+
+    <nav class="topnav" aria-label="Primary Navigation">
+      <a href="#identifier" class="nav-link">Identify</a>
+      <a href="#specimens" class="nav-link">Sample Plants</a>
+      <a href="#personalSpaceSection" class="nav-link">My Personal Space</a>
+      <a href="#guideSection" class="nav-link">How It Works</a>
+      <button id="navTipsBtn" type="button" class="nav-link nav-link-btn">Feature Guide &amp; Tips</button>
+    </nav>
+
+    <div class="topbar-action">
+      <button id="topTipsBtn" type="button" class="btn-secondary">Quick Tour</button>
+      <button id="topUploadBtn" type="button" class="btn-primary">Upload Photo</button>
+    </div>
+  </header>
+
+  <main class="site-container">
+    <!-- Hero & Identification Workspace -->
+    <section id="identifier" class="workspace-hero">
+      <div class="hero-copy-col">
+        <p class="editorial-kicker">Instant Plant &amp; Flower Identifier · Powered by Pl@ntNet</p>
+        <h1 class="hero-title">Identify Any Plant &amp; Keep Your Own Local Garden Journal</h1>
+        <p class="hero-lead">
+          Drop a photo from your laptop, paste an image copied from the web, or paste an image link. No account or email required—your uploaded photos, plant notes, and interests stay on your computer.
+        </p>
+
+        <!-- Interactive Plant Part Selector -->
+        <div class="control-block">
+          <div class="control-header">
+            <span class="control-label">What part of the plant is shown?</span>
+            <span class="control-hint">Switching parts automatically updates results</span>
+          </div>
+          <div class="segmented-bar" role="group" aria-label="Select plant part">
+            <button type="button" class="seg-btn active" data-organ="auto">Auto-detect</button>
+            <button type="button" class="seg-btn" data-organ="leaf">Leaf</button>
+            <button type="button" class="seg-btn" data-organ="flower">Flower</button>
+            <button type="button" class="seg-btn" data-organ="fruit">Fruit</button>
+            <button type="button" class="seg-btn" data-organ="bark">Bark</button>
+          </div>
+        </div>
+
+        <!-- Sample Plants for One-Click Testing -->
+        <div id="specimens" class="sample-strip-block">
+          <div class="control-header">
+            <span class="control-label">Don't have a photo handy? Try a sample plant:</span>
+            <span class="control-hint">Runs a live Pl@ntNet identification</span>
+          </div>
+          <div class="sample-grid">
+            <button type="button" class="sample-card" data-sample="monstera">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M24 6C13 10 8 22 12 34C15 40 21 42 24 42C27 42 33 40 36 34C40 22 35 10 24 6Z" stroke="currentColor" stroke-width="1.75"/>
+                  <path d="M24 6V42M24 18L15 14M24 25L13 22M24 32L16 30M24 18L33 14M24 25L35 22M24 32L32 30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">Swiss Cheese Plant</span>
+                <span class="sample-sub">Monstera deliciosa · Leaf</span>
+              </div>
+            </button>
+
+            <button type="button" class="sample-card" data-sample="hibiscus">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <circle cx="24" cy="24" r="5" stroke="currentColor" stroke-width="1.75"/>
+                  <path d="M24 7C28 7 31 12 28 19C35 16 41 19 41 24C41 29 35 32 28 29C31 36 28 41 24 41C20 41 17 36 20 29C13 32 7 29 7 24C7 19 13 16 20 19C17 12 20 7 24 7Z" stroke="currentColor" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">China Rose Hibiscus</span>
+                <span class="sample-sub">Hibiscus rosa-sinensis · Flower</span>
+              </div>
+            </button>
+
+            <button type="button" class="sample-card" data-sample="ficus">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M24 5C15 12 13 25 18 36C20 40 24 43 24 43C24 43 28 40 30 36C35 25 33 12 24 5Z" stroke="currentColor" stroke-width="1.75"/>
+                  <path d="M24 5V43M24 16L18 12M24 24L17 20M24 32L19 29M24 16L30 12M24 24L31 20M24 32L29 29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">Rubber Plant</span>
+                <span class="sample-sub">Ficus elastica · Leaf</span>
+              </div>
+            </button>
+
+            <button type="button" class="sample-card" data-sample="lavandula">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M24 8V42M20 14C20 11 24 11 24 14C24 11 28 11 28 14M19 21C19 18 24 18 24 21C24 18 29 18 29 21M19 28C19 25 24 25 24 28C24 25 29 25 29 28" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">English Lavender</span>
+                <span class="sample-sub">Lavandula angustifolia · Flower</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Laptop-Friendly Upload, Drag-and-Drop, Paste & URL Stage -->
+      <div class="uploader-stage">
+        <div class="stage-topbar">
+          <span class="stage-title">Plant Photo Input</span>
+          <span id="sanitizedBadge" class="stage-meta">GPS &amp; EXIF metadata stripped automatically</span>
+        </div>
+
+        <input id="file" type="file" accept="image/jpeg,image/png,image/webp" />
+
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Drop plant image here or click to browse">
+          <div id="preview" class="preview empty">
+            <div class="empty-plate">
+              <svg class="plate-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <path d="M32 10C20 16 14 30 18 44C21 51 28 54 32 54C36 54 43 51 46 44C50 30 44 16 32 10Z" stroke="currentColor" stroke-width="1.75"/>
+                <path d="M32 10V54M32 24L22 19M32 34L20 29M32 43L23 39M32 24L42 19M32 34L44 29M32 43L41 39" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <p class="empty-title">Drag &amp; drop a photo here, click to browse, or press Ctrl+V to paste</p>
+              <p class="empty-sub">Supports JPEG, PNG, and WebP up to 20 MB</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Web Image URL Input for Laptop Users -->
+        <form id="urlForm" class="url-input-row">
+          <input id="imageUrlInput" type="url" class="url-input" placeholder="Or paste a direct image URL (https://…)" aria-label="Paste an image URL from the web" />
+          <button id="urlSubmitBtn" type="submit" class="btn-secondary">Identify URL</button>
+        </form>
+
+        <!-- Inline Non-Blocking Progress Bar -->
+        <div id="inlineLoader" class="inline-loader" hidden>
+          <div class="inline-spinner"></div>
+          <span id="inlineLoaderText">Analyzing plant features with Pl@ntNet…</span>
+        </div>
+
+        <div class="stage-actions">
+          <div class="stage-secondary-btns">
+            <label for="file" class="btn-secondary">Browse Computer</label>
+            <button id="dbgReset" type="button" class="btn-ghost">Clear</button>
+          </div>
+          <button id="identify" type="button" class="btn-primary" disabled>Identify Plant</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Accessible Status & Error Banner -->
+    <div id="statusBanner" class="status-banner" role="alert" hidden></div>
+
+    <!-- Plant Identification Result & Care Guide Section -->
+    <section id="result" class="dossier-section" hidden>
+      <div class="dossier-header">
+        <div class="dossier-title-group">
+          <p id="accessionMeta" class="editorial-kicker">Identification Result</p>
+          <h2 id="name" class="dossier-name"></h2>
+          <p id="scientific" class="dossier-scientific"></p>
+          <p id="taxonomy" class="dossier-inline-meta"></p>
+        </div>
+
+        <div class="dossier-Right-group">
+          <div class="confidence-readout">
+            <span class="confidence-label">Match Confidence</span>
+            <div class="confidence-number-row">
+              <span id="confidence" class="confidence-value">0.0%</span>
+            </div>
+            <div class="confidence-bar"><div id="confidenceBar" class="confidence-fill"></div></div>
+          </div>
+
+          <div class="dossier-actions">
+            <button id="saveSpecimenBtn" type="button" class="btn-primary">Save to Personal Space</button>
+            <button id="copyCitationBtn" type="button" class="btn-secondary">Copy Summary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Practical Care & Safety Strip (Full-Width 4-Column Row) -->
+      <div class="care-strip">
+        <div class="care-item">
+          <span class="care-kicker">Sunlight</span>
+          <p id="careSunlight" class="care-value"></p>
+        </div>
+        <div class="care-item">
+          <span class="care-kicker">Watering</span>
+          <p id="careWatering" class="care-value"></p>
+        </div>
+        <div class="care-item">
+          <span class="care-kicker">Pet &amp; Household Safety</span>
+          <p id="careToxicity" class="care-value"></p>
+        </div>
+        <div class="care-item">
+          <span class="care-kicker">Where It Thrives &amp; Care Tip</span>
+          <p id="careEnvironment" class="care-value"></p>
+        </div>
+      </div>
+
+      <div class="dossier-grid">
+        <!-- Left Column: Uploaded Photo + Plant Details -->
+        <div class="dossier-left-col">
+          <figure class="specimen-figure">
+            <div class="result-media" id="mediaArea"></div>
+            <figcaption id="figureCaption" class="figure-caption"></figcaption>
+          </figure>
+
+          <div class="taxonomy-panel">
+            <h3 class="panel-heading">Plant Classification</h3>
+            <dl id="taxonomyList" class="taxonomy-dl"></dl>
+            <div class="vernacular-block">
+              <span class="vernacular-label">Also Known As (Common Names)</span>
+              <p id="commonNames" class="vernacular-list"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Overview, Top 5 Matches & Similar Photos -->
+        <div class="dossier-right-col">
+          <div class="monograph-block">
+            <h3 class="panel-heading">About This Plant</h3>
+            <div id="description" class="description-prose"></div>
+          </div>
+
+          <div class="candidates-block">
+            <div class="panel-header-row">
+              <h3 class="panel-heading">Top 5 Possible Matches</h3>
+              <span class="panel-sub">Click any row to compare its overview and photos</span>
+            </div>
+            <div class="table-scroll">
+              <table class="candidates-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Common Name</th>
+                    <th>Scientific Name</th>
+                    <th>Family</th>
+                    <th class="num-col">Match Score</th>
+                  </tr>
+                </thead>
+                <tbody id="candidatesBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="reference-gallery-block">
+            <div class="panel-header-row">
+              <h3 class="panel-heading">Similar Reference Photos</h3>
+              <span class="panel-sub">Click any photo to zoom in</span>
+            </div>
+            <div id="similar" class="similar gallery"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- User's Zero-Login Personal Space (Desktop Folder Sync + IndexedDB Media Vault) -->
+    <section id="personalSpaceSection" class="personal-space-section">
+      <div class="section-header-bar">
+        <div>
+          <p class="editorial-kicker">Zero-Login Local Workspace · Stored on Your Computer</p>
+          <h2 class="section-heading">My Personal Garden Space</h2>
+          <p class="section-sub">
+            Your uploaded photos, plant notes, and gardening interests are stored in a local high-capacity database (IndexedDB) and can be synced directly to a real folder on your desktop.
+          </p>
+        </div>
+
+        <!-- Desktop Folder Sync & Portable Backup Controls -->
+        <div class="folder-sync-bar">
+          <button id="connectFolderBtn" type="button" class="btn-primary">Link Desktop Folder</button>
+          <button id="exportCollectionBtn" type="button" class="btn-secondary">Download Backup File</button>
+          <label for="importBundleInput" class="btn-secondary">Load Backup File</label>
+          <input id="importBundleInput" type="file" accept=".json,application/json" hidden />
+        </div>
+      </div>
+
+      <!-- Folder Connection & Storage Telemetry Strip -->
+      <div class="vault-status-strip">
+        <div class="vault-stat">
+          <span class="vault-stat-label">Desktop Folder Status</span>
+          <span id="folderStatusText" class="vault-stat-value">Browser Local Vault Active (No desktop folder linked yet)</span>
+        </div>
+        <div class="vault-stat">
+          <span class="vault-stat-label">Stored Photos &amp; Plants</span>
+          <span id="vaultCountText" class="vault-stat-value">0 plants saved</span>
+        </div>
+        <div class="vault-stat">
+          <span class="vault-stat-label">Auto-Save Identifications</span>
+          <div class="autosave-toggle-wrap">
+            <button id="autoSaveToggleBtn" type="button" class="seg-btn active" aria-pressed="true">Auto-Save ON</button>
+            <span class="control-hint">Automatically saves every photo you identify</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal Interests & Growing Environment Preferences -->
+      <div class="preferences-panel">
+        <div class="pref-col">
+          <label for="gardenNameInput" class="control-label">Your Space Name &amp; Growing Setup</label>
+          <div class="pref-inputs-row">
+            <input id="gardenNameInput" type="text" class="search-input" placeholder="e.g., My Desk &amp; Balcony Plants" />
+            <select id="environmentSelect" class="search-input" aria-label="Growing environment">
+              <option value="Indoor Apartment">Indoor Apartment / Desk</option>
+              <option value="Sunny Balcony / Patio">Sunny Balcony / Patio</option>
+              <option value="Backyard Garden">Backyard Garden</option>
+              <option value="Greenhouse / Conservatory">Greenhouse / Conservatory</option>
+            </select>
+            <select id="petPrefSelect" class="search-input" aria-label="Pet safety preference">
+              <option value="No Pets">No Pets at Home</option>
+              <option value="Pet-Safe Priority">Have Cats / Dogs (Warn on Toxic Plants)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="pref-col">
+          <span class="control-label">Your Plant Interests (Click to toggle)</span>
+          <div id="interestsBar" class="segmented-bar interests-bar" role="group" aria-label="Select your plant interests">
+            <button type="button" class="seg-btn interest-btn active" data-interest="Houseplants">Houseplants</button>
+            <button type="button" class="seg-btn interest-btn active" data-interest="Flowers">Flowers</button>
+            <button type="button" class="seg-btn interest-btn" data-interest="Succulents & Cacti">Succulents &amp; Cacti</button>
+            <button type="button" class="seg-btn interest-btn" data-interest="Herbs & Edibles">Herbs &amp; Edibles</button>
+            <button type="button" class="seg-btn interest-btn" data-interest="Trees & Shrubs">Trees &amp; Shrubs</button>
+            <button type="button" class="seg-btn interest-btn" data-interest="Medicinal Plants">Medicinal Plants</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter & Media Library Toolbar -->
+      <div class="collection-toolbar">
+        <div class="segmented-bar" role="group" aria-label="Filter saved plants">
+          <button type="button" class="seg-btn filter-tab active" data-filter="all">All Saved Plants</button>
+          <button type="button" class="seg-btn filter-tab" data-filter="favorites">Favorites</button>
+          <button type="button" class="seg-btn filter-tab" data-filter="with-notes">With Personal Notes</button>
+        </div>
+
+        <div class="collection-controls">
+          <input id="collectionSearch" type="search" class="search-input" placeholder="Search by name, family, or note…" aria-label="Search saved plants" />
+          <button id="syncNowBtn" type="button" class="btn-secondary" hidden>Sync Folder Now</button>
+          <button id="clearCollectionBtn" type="button" class="btn-ghost">Clear Space</button>
+        </div>
+      </div>
+
+      <div id="collectionGrid" class="collection-grid"></div>
+    </section>
+
+    <!-- Feature Reference & Photo Tips Section -->
+    <section id="guideSection" class="guide-section">
+      <div class="section-header-bar">
+        <div>
+          <p class="editorial-kicker">New User Guide · Features &amp; Local Storage</p>
+          <h2 class="section-heading">What Every Feature Does &amp; How Personal Space Works</h2>
+          <p class="section-sub">
+            New here? Open the interactive walkthrough anytime or browse the quick feature breakdown below.
+          </p>
+        </div>
+        <div class="folder-sync-bar">
+          <button id="sectionTipsBtn" type="button" class="btn-primary">Open Interactive Tip Screen</button>
+        </div>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-item">
+          <h3 class="guide-title">01. Four Ways to Input a Plant</h3>
+          <p class="guide-body">
+            Drag &amp; drop a photo from your laptop, click <strong>Browse Computer</strong>, press <strong>Ctrl+V</strong> anywhere on the page to paste a copied image, paste an <code>https://</code> image link, or click one of the 4 <strong>Sample Plants</strong> to test live identification immediately.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">02. Plant Part Selector &amp; Privacy</h3>
+          <p class="guide-body">
+            Choose <strong>Leaf</strong>, <strong>Flower</strong>, <strong>Fruit</strong>, or <strong>Bark</strong> to sharpen Pl@ntNet accuracy—switching parts automatically updates your results. All uploaded photos have GPS &amp; camera EXIF metadata stripped in your browser first.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">03. Care Guide &amp; Top 5 Matches</h3>
+          <p class="guide-body">
+            Every identification generates a 4-column <strong>Care &amp; Pet Safety Strip</strong> (Sunlight, Watering, Cat/Dog Safety, and Environment) plus a <strong>Top 5 Possible Matches</strong> table—click any row to compare close lookalikes and zoom into reference photos.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">04. Zero-Login Personal Garden Space</h3>
+          <p class="guide-body">
+            No email or account needed. With <strong>Auto-Save ON</strong>, every photo you upload is stored in your browser's local high-capacity <strong>IndexedDB</strong> vault where you can add personal care notes, mark favorites, and set your plant interests.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">05. Direct Desktop Folder Sync</h3>
+          <p class="guide-body">
+            Click <strong>Link Desktop Folder</strong> (in Chrome, Edge, or Brave) to pick a real folder on your computer. The app automatically saves your plant photos in <code>/photos/*.jpg</code>, care sheets in <code>/care-cards/*.md</code>, and <code>garden-space.json</code>.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">06. Universal 1-Click Backup File</h3>
+          <p class="guide-body">
+            Using Firefox, Safari, or moving to a new computer? Click <strong>Download Backup File</strong> to save your entire photo collection, notes, and interests as a single <code>.json</code> file on your desktop, and restore it anytime via <strong>Load Backup File</strong>.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Interactive New-User Tip Screen & Feature Guide Modal -->
+  <div id="tipScreenModal" class="tip-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="tipModalTitle" hidden>
+    <div class="tip-modal-card">
+      <div class="tip-modal-header">
+        <div>
+          <p class="editorial-kicker">Welcome &amp; Feature Walkthrough · Step <span id="tipStepIndicator">1</span> of 5</p>
+          <h2 id="tipModalTitle" class="tip-modal-title">How to Use Verdant Plant ID &amp; Your Personal Space</h2>
+        </div>
+        <button id="closeTipModalBtn" type="button" class="btn-ghost" aria-label="Close feature guide">Close ✕</button>
+      </div>
+
+      <!-- Step Navigation Tabs -->
+      <div class="tip-tabs-bar" role="tablist" aria-label="Feature guide steps">
+        <button type="button" class="tip-tab active" data-tip-step="0" role="tab" aria-selected="true">01. Adding Photos</button>
+        <button type="button" class="tip-tab" data-tip-step="1" role="tab" aria-selected="false">02. Plant Parts &amp; Privacy</button>
+        <button type="button" class="tip-tab" data-tip-step="2" role="tab" aria-selected="false">03. Results &amp; Care Guide</button>
+        <button type="button" class="tip-tab" data-tip-step="3" role="tab" aria-selected="false">04. My Personal Space</button>
+        <button type="button" class="tip-tab" data-tip-step="4" role="tab" aria-selected="false">05. Desktop Folder Sync</button>
+      </div>
+
+      <!-- Dynamic Step Content Area -->
+      <div id="tipModalBody" class="tip-modal-body">
+        <!-- Populated dynamically by script.js -->
+      </div>
+
+      <div class="tip-modal-footer">
+        <label class="tip-dont-show">
+          <input id="dontShowTipsAgain" type="checkbox" />
+          <span>Don't show automatically on startup (you can always open "Quick Tour" in the top bar)</span>
+        </label>
+
+        <div class="tip-footer-actions">
+          <button id="prevTipStepBtn" type="button" class="btn-secondary">← Previous</button>
+          <button id="tryFeatureBtn" type="button" class="btn-secondary">Show Me on Page</button>
+          <button id="nextTipStepBtn" type="button" class="btn-primary">Next Tip →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-foot">
+    <div class="foot-inner">
+      <span>Verdant Plant ID · Powered by Pl@ntNet &amp; Wikipedia</span>
+      <span>Zero accounts required · Local IndexedDB Vault + Direct Desktop Folder Sync</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

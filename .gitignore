@@ -1,0 +1,37 @@
+# Environment & Secrets (NEVER commit real keys)
+.env
+.env.*
+!.env.example
+!.env.template
+local.properties
+*API_KEY*
+*.pem
+*.key
+*.crt
+
+# Dependencies
+node_modules/
+api/node_modules/
+
+# Android / Gradle build artifacts
+.gradle/
+build/
+app/build/
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.jks
+*.keystore
+
+# IDE & OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# LLM Export dumps
+*-output.md
+*-output.txt

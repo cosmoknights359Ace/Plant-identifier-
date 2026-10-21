@@ -1,0 +1,5 @@
+{
+  "name": "Plant Identifier",
+  "description": "Privacy-first plant identification web and Android application powered by a secure Pl@ntNet server proxy.",
+  "requestFramePermissions": []
+}

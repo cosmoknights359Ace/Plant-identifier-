@@ -1,0 +1,5 @@
+# Copy this file to local.properties for local Android builds.
+# DO NOT commit local.properties to version control.
+# Configure the backend proxy URL instead of embedding third-party API keys in the APK.
+sdk.dir=/path/to/Android/sdk
+API_BASE_URL=http://10.0.2.2:3000
