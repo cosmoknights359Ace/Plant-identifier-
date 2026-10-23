@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/identify",
+      "destination": "/api/server.js"
+    },
+    {
+      "source": "/wiki-summary",
+      "destination": "/api/server.js"
+    },
+    {
+      "source": "/image-proxy",
+      "destination": "/api/server.js"
+    }
+  ]
+}

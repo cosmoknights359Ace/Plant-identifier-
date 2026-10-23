@@ -1,2 +1,3 @@
-// Delegates to the root hardened server so running from either / or /api uses the exact same secure server
-require('../server.js')
+// Delegates to the root hardened server and exports the Express app for Vercel Serverless Functions
+const app = require('../server.js')
+module.exports = app

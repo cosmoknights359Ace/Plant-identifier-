@@ -1,4 +1,8 @@
 const fileInput = document.getElementById('file')
+const cameraInput = document.getElementById('cameraInput')
+const takePhotoBtn = document.getElementById('takePhotoBtn')
+const mobileCameraNavBtn = document.getElementById('mobileCameraNavBtn')
+const mobileTipsNavBtn = document.getElementById('mobileTipsNavBtn')
 const topUploadBtn = document.getElementById('topUploadBtn')
 const dropzone = document.getElementById('dropzone')
 const preview = document.getElementById('preview')
@@ -29,11 +33,15 @@ const statusBanner = document.getElementById('statusBanner')
 const saveSpecimenBtn = document.getElementById('saveSpecimenBtn')
 const copyCitationBtn = document.getElementById('copyCitationBtn')
 
-// Care Guide elements
+// Care Guide & Agricultural Insights elements
 const careSunlight = document.getElementById('careSunlight')
 const careWatering = document.getElementById('careWatering')
 const careToxicity = document.getElementById('careToxicity')
 const careEnvironment = document.getElementById('careEnvironment')
+const agriPests = document.getElementById('agriPests')
+const agriPrevention = document.getElementById('agriPrevention')
+const agriSoil = document.getElementById('agriSoil')
+const agriPropagation = document.getElementById('agriPropagation')
 
 // Personal Space & Desktop Folder Sync elements
 const connectFolderBtn = document.getElementById('connectFolderBtn')
@@ -54,6 +62,7 @@ let currentBase64 = null
 let currentImageUrl = null
 let currentSampleId = null
 let currentPreviewDataUrl = null
+let currentThumbDataUrl = null
 let selectedOrgan = 'auto'
 let activeCollectionFilter = 'all'
 let lastIdentificationData = null
@@ -81,8 +90,8 @@ const EMPTY_PLATE_HTML = `
       <path d="M32 10C20 16 14 30 18 44C21 51 28 54 32 54C36 54 43 51 46 44C50 30 44 16 32 10Z" stroke="currentColor" stroke-width="1.75"/>
       <path d="M32 10V54M32 24L22 19M32 34L20 29M32 43L23 39M32 24L42 19M32 34L44 29M32 43L41 39" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
-    <p class="empty-title">Drag &amp; drop a photo here, click to browse, or press Ctrl+V to paste</p>
-    <p class="empty-sub">Supports JPEG, PNG, and WebP up to 20 MB</p>
+    <p class="empty-title">Tap to upload a photo, or drag &amp; drop here</p>
+    <p class="empty-sub">Works with phone camera, photo gallery, or Ctrl+V paste</p>
   </div>
 `
 
@@ -278,6 +287,12 @@ async function syncVaultToDesktopFolder() {
         `- **Pet Safety**: ${plant.careGuide?.toxicity || 'Verify before ingestion'}`,
         `- **Environment**: ${plant.careGuide?.environment || ''}`,
         ``,
+        `## Agricultural & Pest Management Guide`,
+        `- **Common Pests & Symptoms**: ${plant.careGuide?.pests || 'Aphids, spider mites, and mealybugs; watch for stippled leaves or sticky honeydew.'}`,
+        `- **Prevention & Organic Treatment**: ${plant.careGuide?.prevention || 'Maintain airflow, inspect leaf undersides weekly, and treat early with cold-pressed neem oil or insecticidal soap.'}`,
+        `- **Soil, pH & Fertilizer (NPK)**: ${plant.careGuide?.soilAndNutrients || 'Well-draining loamy soil (pH 6.0–7.0); feed with balanced NPK fertilizer during active growth.'}`,
+        `- **Propagation & Climate**: ${plant.careGuide?.propagationAndClimate || 'Propagate via stem cuttings, division, or seed in warm, frost-free conditions.'}`,
+        ``,
         `## Personal Notes`,
         `${plant.personalNote || 'No personal notes added yet.'}`,
         ``,
@@ -376,8 +391,7 @@ async function connectDesktopFolder() {
 function updateVaultStatsUI() {
   if (vaultCountText) {
     const count = cachedPlants.length
-    const favCount = cachedPlants.filter(p => p.favorite).length
-    vaultCountText.textContent = `${count} ${count === 1 ? 'plant' : 'plants'} stored (${favCount} favorited)`
+    vaultCountText.textContent = `${count} ${count === 1 ? 'plant' : 'plants'} saved`
   }
 }
 
@@ -439,6 +453,20 @@ if (topUploadBtn) {
   topUploadBtn.addEventListener('click', () => fileInput.click())
 }
 
+if (takePhotoBtn) {
+  takePhotoBtn.addEventListener('click', () => {
+    if (cameraInput) cameraInput.click()
+    else fileInput.click()
+  })
+}
+
+if (mobileCameraNavBtn) {
+  mobileCameraNavBtn.addEventListener('click', () => {
+    if (cameraInput) cameraInput.click()
+    else fileInput.click()
+  })
+}
+
 if (dropzone) {
   dropzone.addEventListener('click', e => {
     if (e.target.closest('button')) return
@@ -483,7 +511,19 @@ window.addEventListener('paste', async e => {
   }
 })
 
-function sanitizeAndResizeImage(file, maxDimension = 1400, quality = 0.86) {
+/**
+ * Low-RAM (6GB Device) & Mobile-Optimized Image Sanitizer.
+ * Uses adaptive resolution (960px on mobile/low-memory devices, 1200px on desktop),
+ * creates a lightweight 320px thumbnail for garden cards so the DOM never decodes
+ * dozens of large bitmaps, and immediately frees canvas memory.
+ */
+function sanitizeAndResizeImage(file) {
+  const isLowRamOrMobile =
+    (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 6) ||
+    window.innerWidth <= 768
+  const maxDimension = isLowRamOrMobile ? 960 : 1200
+  const quality = isLowRamOrMobile ? 0.78 : 0.84
+
   return new Promise((resolve, reject) => {
     if (!file || !file.type.startsWith('image/')) {
       return reject(new Error('Please select a valid image file (JPEG, PNG, or WebP).'))
@@ -494,6 +534,7 @@ function sanitizeAndResizeImage(file, maxDimension = 1400, quality = 0.86) {
 
     const objectUrl = URL.createObjectURL(file)
     const img = new Image()
+    img.decoding = 'async'
     img.onload = () => {
       URL.revokeObjectURL(objectUrl)
       let width = img.naturalWidth || img.width
@@ -515,11 +556,33 @@ function sanitizeAndResizeImage(file, maxDimension = 1400, quality = 0.86) {
       const canvas = document.createElement('canvas')
       canvas.width = width
       canvas.height = height
-      const ctx = canvas.getContext('2d')
+      const ctx = canvas.getContext('2d', { alpha: false })
       ctx.drawImage(img, 0, 0, width, height)
-
       const sanitizedDataUrl = canvas.toDataURL('image/jpeg', quality)
-      resolve({ dataUrl: sanitizedDataUrl, width, height })
+
+      // Generate a lightweight ~15KB thumbnail (320px) for smooth scrolling in "My Garden" on 6GB RAM devices
+      const thumbMax = 320
+      let thumbW = width
+      let thumbH = height
+      if (thumbW > thumbMax || thumbH > thumbMax) {
+        if (thumbW >= thumbH) {
+          thumbH = Math.round((thumbH * thumbMax) / thumbW)
+          thumbW = thumbMax
+        } else {
+          thumbW = Math.round((thumbW * thumbMax) / thumbH)
+          thumbH = thumbMax
+        }
+      }
+      canvas.width = thumbW
+      canvas.height = thumbH
+      ctx.drawImage(img, 0, 0, thumbW, thumbH)
+      const thumbDataUrl = canvas.toDataURL('image/jpeg', 0.7)
+
+      // Free canvas backing store immediately to release RAM
+      canvas.width = 0
+      canvas.height = 0
+
+      resolve({ dataUrl: sanitizedDataUrl, thumbDataUrl, width, height })
     }
     img.onerror = () => {
       URL.revokeObjectURL(objectUrl)
@@ -529,12 +592,13 @@ function sanitizeAndResizeImage(file, maxDimension = 1400, quality = 0.86) {
   })
 }
 
-function setPreviewImage(srcUrl, metaText = 'GPS & EXIF metadata stripped') {
+function setPreviewImage(srcUrl, metaText = 'Private · Location stripped') {
   preview.classList.remove('empty')
   preview.textContent = ''
   const img = document.createElement('img')
   img.src = srcUrl
   img.alt = 'Selected plant photo'
+  img.decoding = 'async'
   img.referrerPolicy = 'no-referrer'
   preview.appendChild(img)
   if (sanitizedBadge) {
@@ -550,17 +614,20 @@ async function handleSelectedFile(file) {
   showStatus('')
   clearSampleSelectionHighlight()
   try {
-    const { dataUrl, width, height } = await sanitizeAndResizeImage(file)
+    const { dataUrl, thumbDataUrl, width, height } = await sanitizeAndResizeImage(file)
     currentPreviewDataUrl = dataUrl
+    currentThumbDataUrl = thumbDataUrl
     currentBase64 = dataUrl.split(',')[1]
     currentImageUrl = null
     currentSampleId = null
     if (imageUrlInput) imageUrlInput.value = ''
-    setPreviewImage(dataUrl, `${width}×${height}px · EXIF scrubbed`)
+    setPreviewImage(dataUrl, `${width}×${height}px · Ready`)
     identifyBtn.disabled = false
+    await runIdentification({ image: currentBase64, organ: selectedOrgan })
   } catch (err) {
     currentBase64 = null
     currentPreviewDataUrl = null
+    currentThumbDataUrl = null
     identifyBtn.disabled = true
     showStatus(err.message || 'Invalid image file.', true)
   }
@@ -570,6 +637,13 @@ fileInput.addEventListener('change', async e => {
   const f = e.target.files && e.target.files[0]
   if (f) await handleSelectedFile(f)
 })
+
+if (cameraInput) {
+  cameraInput.addEventListener('change', async e => {
+    const f = e.target.files && e.target.files[0]
+    if (f) await handleSelectedFile(f)
+  })
+}
 
 if (urlForm) {
   urlForm.addEventListener('submit', async e => {
@@ -585,7 +659,8 @@ if (urlForm) {
     currentSampleId = null
     const proxied = '/image-proxy?url=' + encodeURIComponent(rawUrl)
     currentPreviewDataUrl = proxied
-    setPreviewImage(proxied, 'Loaded from web image URL')
+    currentThumbDataUrl = proxied
+    setPreviewImage(proxied, 'Loaded from image link')
     await runIdentification({ imageUrl: rawUrl, organ: selectedOrgan })
   })
 }
@@ -597,14 +672,16 @@ if (dbgReset) {
     clearSampleSelectionHighlight()
     identifyBtn.disabled = true
     fileInput.value = ''
+    if (cameraInput) cameraInput.value = ''
     if (imageUrlInput) imageUrlInput.value = ''
     currentBase64 = null
     currentImageUrl = null
     currentSampleId = null
     currentPreviewDataUrl = null
+    currentThumbDataUrl = null
     preview.classList.add('empty')
     preview.innerHTML = EMPTY_PLATE_HTML
-    if (sanitizedBadge) sanitizedBadge.textContent = 'GPS & EXIF metadata stripped automatically'
+    if (sanitizedBadge) sanitizedBadge.textContent = 'Private · Location stripped'
     resultSection.hidden = true
   })
 }
@@ -699,6 +776,26 @@ function renderCareStrip(careGuide) {
     const env = cg.environment || 'Indoor pots or sheltered garden beds'
     const tip = cg.careTip ? ` — ${cg.careTip}` : ''
     careEnvironment.textContent = env + tip
+  }
+  if (agriPests) {
+    agriPests.textContent =
+      cg.pests ||
+      'Aphids, spider mites, whiteflies, and mealybugs; look for yellow stippling, curling new shoots, or sticky honeydew on leaves.'
+  }
+  if (agriPrevention) {
+    agriPrevention.textContent =
+      cg.prevention ||
+      'Ensure good spacing and airflow, avoid wetting foliage at night, and spray leaf undersides with neem oil (3 ml/L) or insecticidal soap at first sign of pests.'
+  }
+  if (agriSoil) {
+    agriSoil.textContent =
+      cg.soilAndNutrients ||
+      'Well-draining loamy soil (pH 6.0–7.0) enriched with organic compost; apply balanced NPK (10-10-10) monthly during active growth.'
+  }
+  if (agriPropagation) {
+    agriPropagation.textContent =
+      cg.propagationAndClimate ||
+      'Propagate by stem cuttings, root division, or seed in spring; thrives best at 18–28 °C (65–82 °F) protected from frost.'
   }
 }
 
@@ -971,6 +1068,9 @@ function openLightbox(url, captionText) {
 async function recordCurrentPlantInPersonalSpace(silentAutoSave = false) {
   if (!activeCandidate || !lastIdentificationData) return
   const now = Date.now()
+  const fallbackImgUrl = activeCandidate.similarImageUrls?.[0]
+    ? '/image-proxy?url=' + encodeURIComponent(activeCandidate.similarImageUrls[0])
+    : null
   const entry = {
     id: 'plant_' + now,
     timestamp: now,
@@ -988,11 +1088,8 @@ async function recordCurrentPlantInPersonalSpace(silentAutoSave = false) {
     organUsed: lastIdentificationData.organUsed,
     personalNote: '',
     favorite: false,
-    previewUrl:
-      currentPreviewDataUrl ||
-      (activeCandidate.similarImageUrls?.[0]
-        ? '/image-proxy?url=' + encodeURIComponent(activeCandidate.similarImageUrls[0])
-        : null),
+    previewUrl: currentPreviewDataUrl || fallbackImgUrl,
+    thumbUrl: currentThumbDataUrl || currentPreviewDataUrl || fallbackImgUrl,
     savedDate: new Date().toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -1004,7 +1101,7 @@ async function recordCurrentPlantInPersonalSpace(silentAutoSave = false) {
   await savePlantToVault(entry)
   renderCollection()
   if (!silentAutoSave) {
-    showStatus(`Saved "${entry.plantName}" into your Personal Garden Space.`, false)
+    showStatus(`Saved "${entry.plantName}" to My Garden.`, false)
   }
 }
 
@@ -1032,22 +1129,28 @@ function renderCollection() {
     const empty = document.createElement('div')
     empty.className = 'empty-collection-msg'
     empty.textContent = query
-      ? 'No plants in your Personal Space match your filter.'
-      : 'Your Personal Garden Space is empty. Upload a photo or click "Save to Personal Space" on any plant result to store it here.'
+      ? 'No saved plants match your search.'
+      : 'No plants saved yet. Identify a photo above to start your garden.'
     collectionGrid.appendChild(empty)
     return
   }
+
+  // Build all cards in a single DocumentFragment so the browser performs only 1 layout pass
+  const fragment = document.createDocumentFragment()
 
   list.forEach(entry => {
     const card = document.createElement('article')
     card.className = 'collection-card'
 
-    if (entry.previewUrl) {
+    const cardImgSrc = entry.thumbUrl || entry.previewUrl
+    if (cardImgSrc) {
       const media = document.createElement('div')
       media.className = 'collection-card-media'
       const img = document.createElement('img')
-      img.src = entry.previewUrl
+      img.src = cardImgSrc
       img.alt = entry.plantName || 'Saved plant'
+      img.loading = 'lazy'
+      img.decoding = 'async'
       media.appendChild(img)
       card.appendChild(media)
     }
@@ -1084,10 +1187,9 @@ function renderCollection() {
     meta.className = 'collection-card-meta'
     meta.textContent = `${entry.taxonomy?.family || 'Plantae'} · ${pct}% match · ${entry.savedDate || ''}`
 
-    // Editable Personal Note field saved straight to IndexedDB + Desktop Folder
     const noteInput = document.createElement('textarea')
     noteInput.className = 'note-textarea'
-    noteInput.placeholder = 'Add personal note (e.g., where you found it, room location, watering log)…'
+    noteInput.placeholder = 'Add personal note (e.g., room location, watering log)…'
     noteInput.value = entry.personalNote || ''
     noteInput.addEventListener('change', async () => {
       entry.personalNote = noteInput.value.trim()
@@ -1103,7 +1205,7 @@ function renderCollection() {
     openBtn.textContent = 'View Care Guide'
     openBtn.addEventListener('click', () => {
       if (entry.previewUrl) {
-        setPreviewImage(entry.previewUrl, 'Loaded from Personal Space')
+        setPreviewImage(entry.previewUrl, 'Loaded from My Garden')
       }
       renderDossier(entry)
     })
@@ -1126,8 +1228,10 @@ function renderCollection() {
     body.appendChild(noteInput)
     body.appendChild(actions)
     card.appendChild(body)
-    collectionGrid.appendChild(card)
+    fragment.appendChild(card)
   })
+
+  collectionGrid.appendChild(fragment)
 }
 
 if (saveSpecimenBtn) {
@@ -1205,9 +1309,26 @@ if (copyCitationBtn) {
     if (!activeCandidate) return
     const pct = ((Number(activeCandidate.confidence) || 0) * 100).toFixed(1)
     const cg = activeCandidate.careGuide || lastIdentificationData?.careGuide || {}
-    const summaryText = `${activeCandidate.plantName} (${activeCandidate.scientificName}) — ${pct}% Match\nSunlight: ${
-      cg.sunlight || 'Bright indirect light'
-    }\nWatering: ${cg.watering || 'Water when top soil is dry'}\nPet Safety: ${cg.toxicity || 'Check before ingestion'}`
+    const summaryText = [
+      `${activeCandidate.plantName} (${activeCandidate.scientificName}) — ${pct}% Match`,
+      `Sunlight: ${cg.sunlight || 'Bright indirect light'}`,
+      `Watering: ${cg.watering || 'Water when top soil is dry'}`,
+      `Pet Safety: ${cg.toxicity || 'Check before ingestion'}`,
+      `Pests & Symptoms: ${cg.pests || 'Inspect for aphids, mites, and mealybugs'}`,
+      `Prevention & Treatment: ${cg.prevention || 'Maintain airflow and treat with neem oil or insecticidal soap'}`,
+      `Soil, pH & NPK: ${cg.soilAndNutrients || 'Well-draining loamy soil (pH 6.0–7.0) with balanced NPK'}`
+    ].join('\n')
+
+    if (typeof navigator.share === 'function' && window.innerWidth <= 768) {
+      try {
+        await navigator.share({
+          title: `${activeCandidate.plantName} Care Guide — VxPlants`,
+          text: summaryText
+        })
+        return
+      } catch (_) {}
+    }
+
     try {
       await navigator.clipboard.writeText(summaryText)
       showStatus('Plant summary and care guide copied to clipboard.', false)
@@ -1217,11 +1338,15 @@ if (copyCitationBtn) {
   })
 }
 
+let _searchDebounce = null
 if (collectionSearch) {
-  collectionSearch.addEventListener('input', renderCollection)
+  collectionSearch.addEventListener('input', () => {
+    if (_searchDebounce) clearTimeout(_searchDebounce)
+    _searchDebounce = setTimeout(renderCollection, 120)
+  })
 }
 
-// Download Complete Personal Space Backup (Preferences + Interests + Photos + Notes)
+// Download Complete Personal Space Backup (Works on both Mobile & Desktop)
 if (exportCollectionBtn) {
   exportCollectionBtn.addEventListener('click', () => {
     const payload = {
@@ -1233,15 +1358,15 @@ if (exportCollectionBtn) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    const folderSlug = slugify(userPreferences.gardenName || 'my-personal-garden-space')
+    const folderSlug = slugify(userPreferences.gardenName || 'vxplants-garden')
     a.download = `${folderSlug}-backup.json`
     a.click()
     URL.revokeObjectURL(url)
-    showStatus('Downloaded your complete Personal Garden Space backup file.', false)
+    showStatus('Saved your garden backup file to your device.', false)
   })
 }
 
-// Restore Personal Space Backup File from Desktop
+// Restore Personal Space Backup File
 if (importBundleInput) {
   importBundleInput.addEventListener('change', async e => {
     const file = e.target.files?.[0]
@@ -1262,7 +1387,7 @@ if (importBundleInput) {
       }
       await loadPlantsFromVault()
       renderCollection()
-      showStatus(`Restored ${plantsList.length} plants and your preferences from backup file.`, false)
+      showStatus(`Restored ${plantsList.length} plants from backup file.`, false)
     } catch (err) {
       showStatus('Invalid backup file format. Please select a valid .json backup file.', true)
     } finally {
@@ -1275,356 +1400,66 @@ if (clearCollectionBtn) {
   clearCollectionBtn.addEventListener('click', async () => {
     await clearEntireVault()
     renderCollection()
-    showStatus('Personal Garden Space cleared.', false)
+    showStatus('My Garden cleared.', false)
   })
 }
 
 // ============================================================================
-// 4. Interactive New-User Tip Screen & Feature Walkthrough
+// 4. Simple Welcome Tip Screen (Shown Every Time Website Opens)
 // ============================================================================
 
-const TIP_SEEN_KEY = 'verdant_onboarding_dismissed_v1'
 const tipScreenModal = document.getElementById('tipScreenModal')
-const tipStepIndicator = document.getElementById('tipStepIndicator')
-const tipModalBody = document.getElementById('tipModalBody')
 const closeTipModalBtn = document.getElementById('closeTipModalBtn')
-const prevTipStepBtn = document.getElementById('prevTipStepBtn')
 const nextTipStepBtn = document.getElementById('nextTipStepBtn')
 const tryFeatureBtn = document.getElementById('tryFeatureBtn')
-const dontShowTipsAgain = document.getElementById('dontShowTipsAgain')
 const navTipsBtn = document.getElementById('navTipsBtn')
 const topTipsBtn = document.getElementById('topTipsBtn')
 const sectionTipsBtn = document.getElementById('sectionTipsBtn')
 
-let currentTipStep = 0
-
-const TIP_STEPS = [
-  {
-    stepNum: 1,
-    headline: '01. Four Easy Ways to Add a Plant Photo on Your Laptop',
-    lead: 'Designed for laptops and desktop browsers—no camera permissions or phone apps needed. You can feed a plant photo into the identifier in four ways:',
-    targetSelector: '.uploader-stage',
-    actionLabel: 'Highlight Photo Input Box',
-    features: [
-      {
-        kicker: 'Method 1 · Local File',
-        title: 'Drag & Drop or Browse Computer',
-        desc: 'Drag any JPEG, PNG, or WebP file from your desktop into the dashed photo box, or click "Browse Computer" to pick a photo.'
-      },
-      {
-        kicker: 'Method 2 · Clipboard Paste',
-        title: 'Press Ctrl+V (or Cmd+V) Anywhere',
-        desc: 'Right-click and copy any plant image from Google Images, a chat message, or a screenshot, then press Ctrl+V right on the page.'
-      },
-      {
-        kicker: 'Method 3 · Web Image Link',
-        title: 'Paste an HTTPS Image URL',
-        desc: 'Paste a direct link to a plant photo into the "Or paste a direct image URL" field and click "Identify URL".'
-      },
-      {
-        kicker: 'Method 4 · Instant Test',
-        title: 'One-Click Sample Plants',
-        desc: 'Don\'t have a photo ready? Click Swiss Cheese Plant, Hibiscus, Rubber Plant, or Lavender on the left to run a live Pl@ntNet check.'
-      }
-    ],
-    callout: 'Tip: Once a photo is loaded in the preview box, click "Identify Plant" (or click any Sample Plant for an immediate 1-click result).'
-  },
-  {
-    stepNum: 2,
-    headline: '02. Choosing the Plant Part & Automatic Privacy Stripping',
-    lead: 'Telling the identifier which part of the plant is visible boosts Pl@ntNet accuracy, while built-in canvas scrubbing protects your location privacy.',
-    targetSelector: '.control-block',
-    actionLabel: 'Highlight Plant Part Selector',
-    features: [
-      {
-        kicker: 'Accuracy Booster',
-        title: 'Auto-Detect, Leaf, Flower, Fruit, or Bark',
-        desc: 'Leave it on "Auto-detect" for whole plants, or pick "Leaf" / "Flower" if your photo is a close-up of a single part.'
-      },
-      {
-        kicker: 'Live Re-Calculation',
-        title: 'Switch Parts Without Re-Uploading',
-        desc: 'Already uploaded a photo? Clicking a different plant part button automatically re-runs the identification with that new focus.'
-      },
-      {
-        kicker: 'Zero Location Leaks',
-        title: 'Automatic GPS & EXIF Scrubbing',
-        desc: 'Before any photo leaves your laptop, an HTML5 Canvas strips out embedded GPS coordinates and camera serial metadata.'
-      },
-      {
-        kicker: 'No Camera Prompts',
-        title: '100% Laptop-First Workflow',
-        desc: 'This website never asks for webcam access—everything works cleanly from files, screenshots, and web links.'
-      }
-    ],
-    callout: 'Tip: Clear photos of a single leaf or flower against a simple background yield the highest match confidence scores.'
-  },
-  {
-    stepNum: 3,
-    headline: '03. Understanding Your Results, Care Guide & Top 5 Matches',
-    lead: 'When Pl@ntNet identifies your photo, it builds a complete Care & Safety Guide and lets you compare similar-looking species side by side.',
-    targetSelector: '#specimens',
-    actionLabel: 'Try a Sample Plant Result',
-    features: [
-      {
-        kicker: 'Everyday Care Strip',
-        title: 'Sunlight, Watering & Where It Thrives',
-        desc: 'Right at the top of your results, see plain-English advice on light levels, when to water, and whether it prefers indoor pots or garden beds.'
-      },
-      {
-        kicker: 'Household & Pet Safety',
-        title: 'Cat & Dog Toxicity Warnings',
-        desc: 'Immediately flags plant families known to irritate cats, dogs, or small children (such as Araceae calcium oxalate crystals).'
-      },
-      {
-        kicker: 'Compare Close Lookalikes',
-        title: 'Interactive Top 5 Possible Matches Table',
-        desc: 'Not sure if #1 is exact? Click any row in the "Top 5 Possible Matches" table to load that plant\'s Wikipedia overview, care guide, and photos.'
-      },
-      {
-        kicker: 'Visual Verification',
-        title: 'Zoomable Reference Gallery & Copy Summary',
-        desc: 'Click any reference photo to inspect it full-screen, or click "Copy Summary" to copy the plant name, match score, and care tips.'
-      }
-    ],
-    callout: 'Tip: Click "Save to Personal Space" at the top-right of any result to store that specific match in your collection.'
-  },
-  {
-    stepNum: 4,
-    headline: '04. My Personal Garden Space (Zero-Login Local Vault)',
-    lead: 'Your own personal plant collection, interests, and care journal—without ever creating an account, entering an email ID, or installing an app.',
-    targetSelector: '#personalSpaceSection',
-    actionLabel: 'Jump to My Personal Space',
-    features: [
-      {
-        kicker: 'Hands-Free Saving',
-        title: 'Auto-Save Uploads (ON by Default)',
-        desc: 'Every photo you upload and identify is automatically saved into your browser\'s high-capacity local database (IndexedDB). Toggle Auto-Save ON/OFF anytime.'
-      },
-      {
-        kicker: 'Custom Profile & Interests',
-        title: 'Growing Setup, Pet Alerts & Plant Tags',
-        desc: 'Set your Space Name, Growing Setup (Indoor Apartment, Balcony, Backyard, Greenhouse), Pet Safety preference, and click your favorite plant categories.'
-      },
-      {
-        kicker: 'Your Own Plant Journal',
-        title: 'Personal Care Notes on Every Plant Card',
-        desc: 'Each saved plant has a note box where you can type where you found it, which window it sits by, or when you last watered or fertilized it.'
-      },
-      {
-        kicker: 'Instant Organization',
-        title: 'Favorites, Note Filters & Instant Search',
-        desc: 'Mark plants as "Favorite", filter by "All Saved Plants", "Favorites", or "With Personal Notes", and search by name, family, or note text.'
-      }
-    ],
-    callout: 'Tip: Because it uses IndexedDB instead of basic cookies, your browser vault can hold dozens of high-resolution plant photos locally.'
-  },
-  {
-    stepNum: 5,
-    headline: '05. Saving Directly to a Folder on Your Normal Desktop',
-    lead: 'Want your plant photos, notes, and preferences stored as normal files inside a folder on your desktop? You have two built-in ways:',
-    targetSelector: '.folder-sync-bar',
-    actionLabel: 'Highlight Desktop Folder Controls',
-    features: [
-      {
-        kicker: 'Option A · Live Folder Sync (Chrome, Edge, Brave)',
-        title: 'Click "Link Desktop Folder"',
-        desc: 'Pick any folder on your computer. The site automatically creates and updates /photos/*.jpg, /care-cards/*.md, and garden-space.json inside that folder.'
-      },
-      {
-        kicker: 'Automatic Two-Way Restore',
-        title: 'Re-Link Your Folder Anytime',
-        desc: 'If you clear your browser or open the site later, just click "Link Desktop Folder" and pick your existing folder—your plants and preferences load right back.'
-      },
-      {
-        kicker: 'Option B · Works in Every Browser & Tab',
-        title: 'Click "Download Backup File"',
-        desc: 'Using Firefox, Safari, or an embedded preview window? Click "Download Backup File" to save your entire photo library and notes as a single .json file on your desktop.'
-      },
-      {
-        kicker: 'One-Click Restore',
-        title: 'Click "Load Backup File"',
-        desc: 'Select any previously downloaded backup file from your computer to restore all your plant photos, personal notes, Favorites, and interests.'
-      }
-    ],
-    callout: 'Note: For live desktop folder linking ("Link Desktop Folder"), make sure the site is open in a full Chrome, Edge, or Brave tab rather than an embedded preview frame.'
-  }
-]
-
-function renderTipStep(stepIndex) {
-  currentTipStep = Math.max(0, Math.min(TIP_STEPS.length - 1, stepIndex))
-  const step = TIP_STEPS[currentTipStep]
-
-  if (tipStepIndicator) {
-    tipStepIndicator.textContent = String(step.stepNum)
-  }
-
-  document.querySelectorAll('.tip-tab').forEach((tab, idx) => {
-    const isActive = idx === currentTipStep
-    tab.classList.toggle('active', isActive)
-    tab.setAttribute('aria-selected', String(isActive))
-  })
-
-  if (prevTipStepBtn) {
-    prevTipStepBtn.disabled = currentTipStep === 0
-  }
-  if (nextTipStepBtn) {
-    nextTipStepBtn.textContent =
-      currentTipStep === TIP_STEPS.length - 1 ? 'Done — Start Using App' : 'Next Tip →'
-  }
-  if (tryFeatureBtn) {
-    tryFeatureBtn.textContent = step.actionLabel || 'Show Me on Page'
-  }
-
-  if (!tipModalBody) return
-  tipModalBody.textContent = ''
-
-  const layout = document.createElement('div')
-  layout.className = 'tip-step-layout'
-
-  const headerDiv = document.createElement('div')
-  const h3 = document.createElement('h3')
-  h3.className = 'tip-step-headline'
-  h3.textContent = step.headline
-  const lead = document.createElement('p')
-  lead.className = 'tip-step-lead'
-  lead.textContent = step.lead
-  headerDiv.appendChild(h3)
-  headerDiv.appendChild(lead)
-
-  const grid = document.createElement('div')
-  grid.className = 'tip-feature-grid'
-
-  step.features.forEach(f => {
-    const box = document.createElement('div')
-    box.className = 'tip-feature-box'
-
-    const kicker = document.createElement('span')
-    kicker.className = 'tip-feature-kicker'
-    kicker.textContent = f.kicker
-
-    const title = document.createElement('h4')
-    title.className = 'tip-feature-title'
-    title.textContent = f.title
-
-    const desc = document.createElement('p')
-    desc.className = 'tip-feature-desc'
-    desc.textContent = f.desc
-
-    box.appendChild(kicker)
-    box.appendChild(title)
-    box.appendChild(desc)
-    grid.appendChild(box)
-  })
-
-  const callout = document.createElement('div')
-  callout.className = 'tip-callout'
-  callout.textContent = step.callout
-
-  layout.appendChild(headerDiv)
-  layout.appendChild(grid)
-  layout.appendChild(callout)
-  tipModalBody.appendChild(layout)
-}
-
-function openTipScreen(stepIndex = 0) {
+function openTipScreen() {
   if (!tipScreenModal) return
-  renderTipStep(stepIndex)
-  if (dontShowTipsAgain) {
-    dontShowTipsAgain.checked = localStorage.getItem(TIP_SEEN_KEY) === 'true'
-  }
   tipScreenModal.hidden = false
 }
 
-function closeTipScreen(markDismissed = true) {
+function closeTipScreen() {
   if (!tipScreenModal) return
   tipScreenModal.hidden = true
-  if (markDismissed || (dontShowTipsAgain && dontShowTipsAgain.checked)) {
-    try {
-      localStorage.setItem(TIP_SEEN_KEY, 'true')
-    } catch (_) {}
-  }
-}
-
-function spotlightFeatureOnPage(selector) {
-  closeTipScreen(true)
-  const target = document.querySelector(selector)
-  if (!target) return
-  target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  target.classList.add('feature-spotlight-pulse')
-  setTimeout(() => {
-    target.classList.remove('feature-spotlight-pulse')
-  }, 2600)
-}
-
-document.querySelectorAll('.tip-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    const idx = Number(tab.getAttribute('data-tip-step') || 0)
-    renderTipStep(idx)
-  })
-})
-
-if (prevTipStepBtn) {
-  prevTipStepBtn.addEventListener('click', () => {
-    if (currentTipStep > 0) renderTipStep(currentTipStep - 1)
-  })
 }
 
 if (nextTipStepBtn) {
-  nextTipStepBtn.addEventListener('click', () => {
-    if (currentTipStep < TIP_STEPS.length - 1) {
-      renderTipStep(currentTipStep + 1)
-    } else {
-      closeTipScreen(true)
-    }
-  })
+  nextTipStepBtn.addEventListener('click', closeTipScreen)
+}
+
+if (closeTipModalBtn) {
+  closeTipModalBtn.addEventListener('click', closeTipScreen)
 }
 
 if (tryFeatureBtn) {
   tryFeatureBtn.addEventListener('click', () => {
-    const step = TIP_STEPS[currentTipStep]
-    if (step && step.targetSelector) {
-      spotlightFeatureOnPage(step.targetSelector)
+    closeTipScreen()
+    const firstSampleCard = document.querySelector('.sample-card[data-sample="monstera"]')
+    if (firstSampleCard) {
+      firstSampleCard.click()
     }
   })
 }
 
-if (closeTipModalBtn) {
-  closeTipModalBtn.addEventListener('click', () => closeTipScreen(true))
-}
-
 if (tipScreenModal) {
   tipScreenModal.addEventListener('click', e => {
-    if (e.target === tipScreenModal) closeTipScreen(true)
+    if (e.target === tipScreenModal) closeTipScreen()
   })
 }
 
-if (dontShowTipsAgain) {
-  dontShowTipsAgain.addEventListener('change', () => {
-    try {
-      if (dontShowTipsAgain.checked) {
-        localStorage.setItem(TIP_SEEN_KEY, 'true')
-      } else {
-        localStorage.removeItem(TIP_SEEN_KEY)
-      }
-    } catch (_) {}
-  })
-}
-
-;[navTipsBtn, topTipsBtn, sectionTipsBtn].forEach(btn => {
+;[navTipsBtn, topTipsBtn, sectionTipsBtn, mobileTipsNavBtn].forEach(btn => {
   if (btn) {
-    btn.addEventListener('click', () => openTipScreen(0))
+    btn.addEventListener('click', openTipScreen)
   }
 })
 
 window.addEventListener('keydown', e => {
   if (!tipScreenModal || tipScreenModal.hidden) return
   if (e.key === 'Escape') {
-    closeTipScreen(true)
-  } else if (e.key === 'ArrowRight' && currentTipStep < TIP_STEPS.length - 1) {
-    renderTipStep(currentTipStep + 1)
-  } else if (e.key === 'ArrowLeft' && currentTipStep > 0) {
-    renderTipStep(currentTipStep - 1)
+    closeTipScreen()
   }
 })
 
@@ -1633,11 +1468,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   loadUserPreferences()
   await loadPlantsFromVault()
   renderCollection()
-
-  // Automatically open the interactive Feature Guide & Tip Screen for first-time visitors
-  const hasDismissedTips = localStorage.getItem(TIP_SEEN_KEY) === 'true'
-  if (!hasDismissedTips) {
-    openTipScreen(0)
-  }
+  openTipScreen()
 })
+
 

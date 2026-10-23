@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "functions": {
+    "api/server.js": {
+      "includeFiles": "web/**"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/api/server.js"
+    }
+  ]
+}

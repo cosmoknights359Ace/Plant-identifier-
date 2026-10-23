@@ -1,16 +1,19 @@
-# Plant Identifier — Web + Pl@ntNet Proxy
+# VxPlants — User Guide
 
-This repository contains the web frontend (`web/`) and hardened Node/Express proxy (`server.js` / `api/server.js`) to call the **Pl@ntNet API (`my.plantnet.org`)** safely without exposing credentials or user EXIF metadata.
+**VxPlants** lets you identify plants, flowers, and trees from a photo and keep your own personal garden journal on your phone or computer—without creating an account.
 
-## Structure
-- `web/`: Static frontend (`index.html`, `script.js`, `style.css`)
-- `server.js` & `api/`: Node/Express proxy that converts sanitized uploads to `multipart/form-data`, queries `https://my-api.plantnet.org/v2/identify/all`, enriches descriptions via Wikipedia REST API, and returns normalized results.
+## How to Use the Website
 
-## Quick Start
-1. Copy `.env.example` to `.env` and set `PLANTNET_API_KEY` from [my.plantnet.org](https://my.plantnet.org/).
-2. Run:
-   ```bash
-   npm install
-   npm start
-   ```
-3. Open `http://localhost:3000` in your browser.
+1. **Snap or Upload a Photo**
+   - **Mobile**: Tap **Take Photo** to use your camera, or **Photo Library** to choose from your gallery.
+   - **Desktop**: Drag and drop a photo into the box, click **Photo Library**, or press **Ctrl+V** to paste a copied image.
+   - **No Photo Handy?**: Tap any of the **Sample Plants** (*Swiss Cheese Plant*, *Hibiscus*, *Rubber Plant*, or *English Lavender*) to see an instant live demo.
+
+2. **Read Your Care Guide & Compare Matches**
+   - View **Sunlight**, **Watering**, **Pet Safety**, and **Best Spot** recommendations at a glance.
+   - Tap any reference photo to zoom in, or tap **Share / Copy** to share the care summary.
+   - Tap any row under **Other Possible Matches** to compare close lookalikes.
+
+3. **Save & Organize in "My Garden"**
+   - Identified plants are saved to **My Garden** on your device so you can add personal care notes and mark **Favorites**.
+   - Use **Save Backup** and **Restore Backup** to move your saved garden between your phone and computer anytime.
