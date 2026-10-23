@@ -4,7 +4,6 @@ A privacy-first Plant Identifier web application and Android (Kotlin + Jetpack C
 
 ## Security & Privacy Architecture
 
-- **Zero Client-Side API Keys**: Both the Web frontend and Android app communicate exclusively with the backend proxy (`POST /identify`). Your `PLANTNET_API_KEY` stays strictly in server-side environment variables (`.env`) and is never bundled into browser code or Android APKs.
 - **Automatic Client-Side EXIF & GPS Stripping**: Before any photo leaves the browser or Android device, it is re-encoded to strip all embedded camera EXIF metadata (including GPS coordinates, timestamps, and device serial numbers).
 - **SSRF-Protected Image Proxy**: Reference images from `bs.plantnet.org` and Wikimedia are served via `/image-proxy` with HTTPS enforcement, DNS/private-IP blocking, MIME verification, and a strict domain allowlist.
 
