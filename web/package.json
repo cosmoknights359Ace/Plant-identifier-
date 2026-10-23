@@ -9,6 +9,7 @@
     "build": "mkdir -p public && cp index.html style.css script.js groot.svg public/"
   },
   "dependencies": {
+    "@vercel/speed-insights": "^2.0.0",
     "axios": "^1.13.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
