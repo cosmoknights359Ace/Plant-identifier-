@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "build": "mkdir -p public && cp web/index.html web/style.css web/script.js web/groot.svg public/"
+    "build": "mkdir -p public && cp web/index.html web/style.css web/script.js web/groot.svg web/icon.svg web/manifest.json web/sw.js web/pwa-192x192.png web/pwa-512x512.png web/pwa-maskable-512x512.png web/apple-touch-icon.png public/"
   },
   "dependencies": {
     "axios": "^1.13.5",

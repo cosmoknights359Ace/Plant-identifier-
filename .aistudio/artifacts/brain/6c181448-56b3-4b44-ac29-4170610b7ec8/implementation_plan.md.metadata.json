@@ -1,0 +1,6 @@
+{
+  "summary":  "Implementation plan for adding Plant Geek Results & Details features—centered on a Seasonal Care Calendar, an Interactive Watering & Feeding Estimator, Precision Grower Telemetry (PPFD, VPD, Substrate Recipe, USDA Zones), and Botanical Field Notes—in a clean, scannable layout across both the Web app (/web) and Android app (/app).",
+  "updatedAt":  "2026-10-23T16:48:00.647194383Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

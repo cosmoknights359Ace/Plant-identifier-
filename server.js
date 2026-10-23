@@ -152,7 +152,8 @@ async function fetchImageBufferWithCache(url, timeoutMs = 10000) {
     maxContentLength: 8 * 1024 * 1024,
     headers: {
       'User-Agent': 'VxPlantsBotanicalGuide/1.0 (https://my.plantnet.org; botanical-education)',
-      Accept: 'image/avif,image/webp,image/apng,image/*,*/*;q=0.8'
+      // Request JPEG/PNG specifically because Pl@ntNet v2 API rejects AVIF/WebP buffers with HTTP 400
+      Accept: 'image/jpeg,image/png;q=0.9,*/*;q=0.5'
     }
   })
   const contentType = (resp.headers['content-type'] || 'image/jpeg').toLowerCase()
@@ -175,7 +176,7 @@ const proxyLimiter = rateLimit({
 })
 
 // Hardened image proxy to avoid CORS/referrer hotlink issues while blocking SSRF & caching against 429s
-app.get('/image-proxy', proxyLimiter, async (req, res) => {
+app.get(['/image-proxy', '/api/image-proxy'], proxyLimiter, async (req, res) => {
   try {
     const parsed = await validateSafeExternalHttpsUrl(req.query.url)
     const targetUrl = parsed.toString()
@@ -404,6 +405,8 @@ function buildCareGuide(scientificName, family, genus, wikiExtract) {
     soilAndNutrients = 'Humus-rich, moisture-retentive yet aerated soil (pH 5.5–6.5); feed monthly in spring/summer.'
   }
 
+  const geekProfile = buildPlantGeekProfile(scientificName, family, genus, wikiExtract)
+
   return {
     sunlight,
     watering,
@@ -413,7 +416,354 @@ function buildCareGuide(scientificName, family, genus, wikiExtract) {
     pests,
     prevention,
     soilAndNutrients,
-    propagationAndClimate
+    propagationAndClimate,
+    geekProfile
+  }
+}
+
+function buildPlantGeekProfile(scientificName, family, genus, wikiExtract) {
+  const sci = (scientificName || '').toLowerCase()
+  const fam = (family || '').toLowerCase()
+  const gen = (genus || '').toLowerCase()
+  const text = (wikiExtract || '').toLowerCase()
+  const cleanSpecies = (scientificName || 'Plantae').replace(/\s+[A-Z(].*$/, '').trim() || 'Plantae'
+
+  let telemetry = {
+    ppfdRange: '150–350 μmol/m²/s',
+    luxRange: '3,000–10,000 Lux (280–930 FC)',
+    humidityRange: '45–65% RH',
+    vpdRange: '0.8–1.2 kPa',
+    tempRange: '18–27°C (65–80°F)',
+    usdaZones: 'USDA Zones 9–11',
+    soilPh: '6.0–6.8 (Slightly Acidic)',
+    growthHabit: 'Perennial vascular specimen',
+    nativeBiome: 'Subtropical & temperate woodland margins'
+  }
+
+  let substrateMix = [
+    { label: 'Screened Compost / Loam', percent: 40 },
+    { label: 'Coco Coir / Peat Moss', percent: 25 },
+    { label: 'Perlite / Pumice', percent: 25 },
+    { label: 'Fine Pine Bark & Biochar', percent: 10 }
+  ]
+
+  let wateringBase = {
+    baseIntervalDays: 7,
+    dryBackPercent: '45–60% top volume dry',
+    baseVolumeMl: 350,
+    npkRatio: 'Balanced 10-10-10 or 3-1-2',
+    fertilizerDilution: '1/2 strength (EC 1.0–1.3 mS/cm) every 2–3 weeks in active growth',
+    waterQualityNote: 'Dechlorinated tap or rainwater (<180 ppm TDS) at room temperature'
+  }
+
+  let seasonalCalendar = {
+    spring: {
+      season: 'Spring (Mar–May)',
+      phase: 'Meristem Flush & Repotting',
+      waterNote: 'Increase hydration by ~25% as new root tips and shoots emerge.',
+      feedNote: 'Begin half-strength balanced NPK feeding every 2–3 weeks.',
+      actionTip: 'Optimal window to repot into fresh substrate, prune leggy stems, and take cuttings.'
+    },
+    summer: {
+      season: 'Summer (Jun–Aug)',
+      phase: 'Peak Photosynthesis & Canopy Growth',
+      waterNote: 'Peak transpiration—check soil moisture every 4–6 days and flush salts mid-season.',
+      feedNote: 'Regular bi-weekly feeding + calcium/magnesium & trace micronutrients.',
+      actionTip: 'Maintain strong air circulation and shield tender foliage from scorching afternoon glass heat.'
+    },
+    autumn: {
+      season: 'Autumn (Sep–Nov)',
+      phase: 'Hardening Off & Metabolic Taper',
+      waterNote: 'Lengthen watering interval by 25–35% as photoperiod shortens.',
+      feedNote: 'Taper off nitrogen; final light potassium boost in early autumn.',
+      actionTip: 'Inspect thoroughly for hitchhiking pests before bringing outdoor containers inside.'
+    },
+    winter: {
+      season: 'Winter (Dec–Feb)',
+      phase: 'Quiescence / Winter Rest',
+      waterNote: 'Allow 65–75% soil dry-back; cold wet roots rapidly invite Pythium rot.',
+      feedNote: 'Pause fertilizer unless growing under 12+ hrs of full-spectrum LED grow lights.',
+      actionTip: 'Keep clear of dry heating vents and freezing window panes; clean dust off leaf surfaces.'
+    }
+  }
+
+  let fieldNotes = {
+    diagnosticTraits:
+      'Examine phyllotaxy (leaf arrangement), venation pattern, petiole attachment, and stipule scars for species-level confirmation.',
+    lookalikeNote:
+      'Compare leaf margin serration, underside pubescence, and floral bract geometry against closely related congeners in ' +
+      (family || 'this family') +
+      '.',
+    botanicalEtymology:
+      `Classified under genus ${genus || 'Plantae'} (${family || 'Angiosperms'}); adaptive morphology reflects native light and moisture regimes.`
+  }
+
+  if (
+    fam === 'araceae' ||
+    gen === 'monstera' ||
+    gen === 'philodendron' ||
+    gen === 'epipremnum' ||
+    gen === 'zamioculcas' ||
+    gen === 'spathiphyllum' ||
+    gen === 'aglaonema' ||
+    gen === 'colocasia' ||
+    gen === 'alocasia'
+  ) {
+    telemetry = {
+      ppfdRange: '120–280 μmol/m²/s',
+      luxRange: '2,500–6,500 Lux (230–600 FC)',
+      humidityRange: '60–80% RH',
+      vpdRange: '0.7–1.0 kPa',
+      tempRange: '19–29°C (66–85°F)',
+      usdaZones: 'USDA Zones 10b–12',
+      soilPh: '5.5–6.5 (Acidic Aroid Range)',
+      growthHabit: 'Hemiepiphytic climbing liana / rhizomatous aroid',
+      nativeBiome: 'Neotropical & Paleotropical humid rainforest understory'
+    }
+    substrateMix = [
+      { label: 'Chunky Pine / Orchid Bark', percent: 35 },
+      { label: 'Coarse Perlite / Pumice', percent: 25 },
+      { label: 'Coco Coir / Chips', percent: 25 },
+      { label: 'Worm Castings & Horticultural Charcoal', percent: 15 }
+    ]
+    wateringBase = {
+      baseIntervalDays: 8,
+      dryBackPercent: '50–70% airy matrix dry',
+      baseVolumeMl: 360,
+      npkRatio: '3-1-2 Foliage Ratio + Cal-Mag',
+      fertilizerDilution: 'Weakly-weekly at 1/4–1/2 strength (EC 0.9–1.3 mS/cm) in spring/summer',
+      waterQualityNote: 'Low-mineral water (<120 ppm TDS) prevents guttation tip burn on leaf margins'
+    }
+    seasonalCalendar = {
+      spring: {
+        season: 'Spring (Mar–May)',
+        phase: 'Cataphyll Unfurling & Root Surge',
+        waterNote: 'Hydrate thoroughly when top 5 cm of chunky bark mix dries; mist moss poles.',
+        feedNote: 'Start 3-1-2 liquid foliage feed + silica for cell wall strength.',
+        actionTip: 'Anchor emerging aerial roots into a damp sphagnum moss pole or cedar plank to trigger larger fenestrations.'
+      },
+      summer: {
+        season: 'Summer (Jun–Aug)',
+        phase: 'Maximum Fenestration & Leaf Size Jump',
+        waterNote: 'Keep moss pole evenly damp and drench substrate every 6–8 days.',
+        feedNote: 'Feed every other watering; flush substrate with plain water once a month.',
+        actionTip: 'Wipe broad lamina every 2 weeks and keep RH >60% so new leaves unfurl without sticking.'
+      },
+      autumn: {
+        season: 'Autumn (Sep–Nov)',
+        phase: 'Internode Slowdown',
+        waterNote: 'Allow top 60% of pot volume to dry before re-saturating.',
+        feedNote: 'Reduce feed to once a month at 1/4 dilution.',
+        actionTip: 'Check petiole crevices and abaxial leaf surfaces for thrips larvae before winter.'
+      },
+      winter: {
+        season: 'Winter (Dec–Feb)',
+        phase: 'Tropical Understory Rest',
+        waterNote: 'Extend interval to 10–14 days; never let pot sit in cold saucer water.',
+        feedNote: 'Withhold NPK unless supplemental grow lights maintain >150 μmol/m²/s.',
+        actionTip: 'Run a cool-mist humidifier nearby if indoor heating drops RH below 40%.'
+      }
+    }
+    fieldNotes = {
+      diagnosticTraits:
+        'Spadix inflorescence subtended by a modified bract (spathe); presence of calcium oxalate raphides; mature blades often exhibit pinnatifid lobes, fenestrations, or distinct primary lateral veins.',
+      lookalikeNote:
+        'Frequently confused with Epipremnum pinnatum (smaller pores along midrib), Rhaphidophora tetrasperma ("Mini Monstera"), or juvenile Philodendron species—check for the swollen geniculum at the lamina-petiole junction.',
+      botanicalEtymology:
+        'Family Araceae; evolved skototropism (seedlings grow toward dark tree trunks before climbing toward canopy light flecks).'
+    }
+  } else if (gen === 'ficus' || fam === 'moraceae') {
+    telemetry = {
+      ppfdRange: '250–500 μmol/m²/s',
+      luxRange: '5,000–15,000 Lux (460–1,400 FC)',
+      humidityRange: '50–70% RH',
+      vpdRange: '0.8–1.2 kPa',
+      tempRange: '18–29°C (65–85°F)',
+      usdaZones: 'USDA Zones 10–12',
+      soilPh: '6.0–6.5 (Loamy Slightly Acidic)',
+      growthHabit: 'Evergreen lactiferous woody tree / hemiepiphyte',
+      nativeBiome: 'South & Southeast Asian monsoon and tropical forests'
+    }
+    substrateMix = [
+      { label: 'High-Drainage Potting Loam', percent: 40 },
+      { label: 'Pine Bark Fines', percent: 25 },
+      { label: 'Perlite / Pumice', percent: 25 },
+      { label: 'Compost & Horticultural Grit', percent: 10 }
+    ]
+    wateringBase = {
+      baseIntervalDays: 9,
+      dryBackPercent: '50–65% top half dry',
+      baseVolumeMl: 400,
+      npkRatio: '3-1-2 or Balanced 20-20-20',
+      fertilizerDilution: 'Half-strength liquid feed every 3–4 weeks from March through September',
+      waterQualityNote: 'Room-temperature water; cold root shock causes rapid lower leaf abscission'
+    }
+    fieldNotes = {
+      diagnosticTraits:
+        'Coriaceous (leathery) leaves enclosed in a prominent coloured stipular cap (calyptra) prior to unfurling; exudes white latex sap when vascular tissue is nicked; enclosed syconium fig inflorescence.',
+      lookalikeNote:
+        'Distinguish Ficus elastica from Magnolia grandiflora or Clusia rosea (Autograph Tree) by the long pointed terminal bud sheath and milky latex sap.',
+      botanicalEtymology:
+        'Family Moraceae; possesses specialized cystoliths (calcium carbonate concretions) visible as microscopic dots in upper epidermal cells.'
+    }
+  } else if (gen === 'hibiscus' || fam === 'malvaceae' || gen === 'abelmoschus' || gen === 'gossypium') {
+    telemetry = {
+      ppfdRange: '450–900+ μmol/m²/s',
+      luxRange: '15,000–45,000 Lux (1,400–4,200 FC)',
+      humidityRange: '50–75% RH',
+      vpdRange: '0.9–1.3 kPa',
+      tempRange: '18–32°C (65–90°F)',
+      usdaZones: 'USDA Zones 9–11 (Tropical) / 5–9 (Hardy spp.)',
+      soilPh: '6.0–6.8 (Rich Slightly Acidic)',
+      growthHabit: 'Woody flowering shrub / malvaceous perennial',
+      nativeBiome: 'Tropical & subtropical coastal and forest edges'
+    }
+    substrateMix = [
+      { label: 'Compost-Enriched Loam', percent: 45 },
+      { label: 'Coco Coir / Peat', percent: 25 },
+      { label: 'Perlite / Pumice', percent: 20 },
+      { label: 'Worm Castings & Azomite', percent: 10 }
+    ]
+    wateringBase = {
+      baseIntervalDays: 4,
+      dryBackPercent: '25–40% surface dry (keep evenly moist)',
+      baseVolumeMl: 480,
+      npkRatio: 'High-Potassium Low-Phosphorus (10-4-12 / 9-3-13)',
+      fertilizerDilution: 'Half-strength weekly or full-strength bi-weekly during active bud set',
+      waterQualityNote: 'Consistent moisture prevents premature pedicel abscission (bud drop)'
+    }
+    fieldNotes = {
+      diagnosticTraits:
+        'Monadelphous stamens fused into a prominent staminal column surrounding the style; five-lobed stigma; epicalyx bracteoles at calyx base; alternate palmately veined serrate leaves.',
+      lookalikeNote:
+        'Differentiate Hibiscus rosa-sinensis from Hibiscus syriacus (Rose of Sharon) by glossy dark-green leaves, longer exserted staminal column, and frost sensitivity.',
+      botanicalEtymology:
+        'Family Malvaceae; mucilage canals in stems and leaves help buffer short-term midday transpiration stress.'
+    }
+  } else if (
+    gen === 'lavandula' ||
+    fam === 'lamiaceae' ||
+    gen === 'rosmarinus' ||
+    gen === 'salvia' ||
+    gen === 'mentha' ||
+    gen === 'ocimum' ||
+    gen === 'thymus' ||
+    gen === 'origanum'
+  ) {
+    telemetry = {
+      ppfdRange: '500–1,000+ μmol/m²/s',
+      luxRange: '20,000–60,000 Lux (Full Direct Sun)',
+      humidityRange: '30–50% RH (Low / Dry Airflow)',
+      vpdRange: '1.1–1.6 kPa',
+      tempRange: '15–30°C (60–86°F)',
+      usdaZones: 'USDA Zones 5–9',
+      soilPh: '6.5–7.5 (Neutral to Calcareous Alkaline)',
+      growthHabit: 'Aromatic evergreen subshrub / herbaceous Lamiaceae',
+      nativeBiome: 'Mediterranean garrigue & rocky limestone slopes'
+    }
+    substrateMix = [
+      { label: 'Coarse Horticultural Sand / Grit', percent: 40 },
+      { label: 'Pumice / Perlite / Crushed Limestone', percent: 30 },
+      { label: 'Light Garden Loam', percent: 20 },
+      { label: 'Aged Compost', percent: 10 }
+    ]
+    wateringBase = {
+      baseIntervalDays: 11,
+      dryBackPercent: '80–95% bone dry between deep soaks',
+      baseVolumeMl: 280,
+      npkRatio: 'Low-Nitrogen 2-6-6 or Bone Meal',
+      fertilizerDilution: 'Light spring top-dressing only; excess N dilutes monoterpene essential oils',
+      waterQualityNote: 'Tolerates hard/alkaline water well; never wet dense foliage crown at night'
+    }
+    fieldNotes = {
+      diagnosticTraits:
+        'Quadrangular (square) stems in cross-section; opposite decussate leaves without stipules; epidermal glandular trichomes rich in volatile terpenoids (linalool, linalyl acetate); bilabiate corolla.',
+      lookalikeNote:
+        'Distinguish Lavandula angustifolia (English Lavender) from Lavandula × intermedia (Lavandin) and Lavandula stoechas (Spanish Lavender) by compact unbranched flower spikes and lack of showy terminal sterile bracts.',
+      botanicalEtymology:
+        'Family Lamiaceae; silvery tomentose leaf indumentum reflects intense Mediterranean UV radiation and reduces boundary-layer water loss.'
+    }
+  } else if (
+    fam === 'cactaceae' ||
+    fam === 'crassulaceae' ||
+    gen === 'aloe' ||
+    gen === 'echeveria' ||
+    gen === 'sedum' ||
+    gen === 'haworthia' ||
+    gen === 'opuntia'
+  ) {
+    telemetry = {
+      ppfdRange: '400–850 μmol/m²/s',
+      luxRange: '15,000–40,000 Lux',
+      humidityRange: '25–45% RH',
+      vpdRange: '1.2–1.8 kPa',
+      tempRange: '15–32°C (60–90°F)',
+      usdaZones: 'USDA Zones 9–11',
+      soilPh: '6.0–7.0 (Mineral Gritty Mix)',
+      growthHabit: 'CAM-photosynthetic stem or leaf succulent',
+      nativeBiome: 'Arid & semi-arid rocky xeric plateaus'
+    }
+    substrateMix = [
+      { label: 'Pumice / Turface / Lava Rock', percent: 45 },
+      { label: 'Coarse Silica Grit / Perlite', percent: 30 },
+      { label: 'Sifted Coco Coir / Loam', percent: 20 },
+      { label: 'Worm Castings', percent: 5 }
+    ]
+    wateringBase = {
+      baseIntervalDays: 16,
+      dryBackPercent: '100% full desiccation ("Soak & Dry")',
+      baseVolumeMl: 240,
+      npkRatio: 'Low-Nitrogen Cactus 2-7-7',
+      fertilizerDilution: '1/4 strength 2–3 times per year during spring/summer active growth',
+      waterQualityNote: 'Drench until water runs freely from drainage holes, then let dry completely'
+    }
+    fieldNotes = {
+      diagnosticTraits:
+        'Water-storing chlorenchyma and hydrenchyma tissues; thick waxy epicuticular cuticle (farina); Crassulacean Acid Metabolism (CAM) opens stomata at night to minimize water loss.',
+      lookalikeNote:
+        'Avoid wiping protective powdery farina off succulent leaves—it does not grow back and protects against sunburn.',
+      botanicalEtymology:
+        'Xerophytic adaptation featuring nocturnal CO₂ fixation into malic acid.'
+    }
+  } else if (fam === 'orchidaceae' || gen === 'phalaenopsis' || gen === 'dendrobium') {
+    telemetry = {
+      ppfdRange: '100–220 μmol/m²/s',
+      luxRange: '2,000–5,000 Lux (Diffused Canopy Light)',
+      humidityRange: '55–75% RH',
+      vpdRange: '0.6–1.0 kPa',
+      tempRange: '18–28°C (65–82°F)',
+      usdaZones: 'USDA Zones 10–12 (Indoor Epiphyte)',
+      soilPh: '5.5–6.2 (Epiphytic Bark Media)',
+      growthHabit: 'Monopodial or sympodial tropical epiphyte',
+      nativeBiome: 'Humid tropical forest canopy branches'
+    }
+    substrateMix = [
+      { label: 'Coarse Orchiata / Fir Bark', percent: 60 },
+      { label: 'New Zealand Sphagnum Moss', percent: 20 },
+      { label: 'Chunky Perlite / Sponge Rock', percent: 10 },
+      { label: 'Horticultural Charcoal', percent: 10 }
+    ]
+    wateringBase = {
+      baseIntervalDays: 8,
+      dryBackPercent: '85–100% (Wait until velamen roots turn silvery-white)',
+      baseVolumeMl: 300,
+      npkRatio: 'MSU Orchid Formula 13-3-15 or 20-20-20',
+      fertilizerDilution: '"Weakly, weekly" at 1/4 strength (EC 0.5–0.8 mS/cm)',
+      waterQualityNote: 'Flush bark every 4th watering with pure water; never leave water in the crown'
+    }
+  }
+
+  return {
+    telemetry,
+    substrateMix,
+    wateringBase,
+    seasonalCalendar,
+    fieldNotes,
+    researchLinks: {
+      powo: `https://powo.science.kew.org/results?q=${encodeURIComponent(cleanSpecies)}`,
+      gbif: `https://www.gbif.org/species/search?q=${encodeURIComponent(cleanSpecies)}`,
+      inaturalist: `https://www.inaturalist.org/taxa/search?q=${encodeURIComponent(cleanSpecies)}`
+    }
   }
 }
 
@@ -445,7 +795,7 @@ async function fetchWikipediaSummary(scientificName) {
 }
 
 // Endpoint to fetch Wikipedia botanical summary + Care Guide for any candidate species selected by the user
-app.get('/wiki-summary', proxyLimiter, async (req, res) => {
+app.get(['/wiki-summary', '/api/wiki-summary'], proxyLimiter, async (req, res) => {
   const species = typeof req.query.species === 'string' ? req.query.species.trim() : ''
   const family = typeof req.query.family === 'string' ? req.query.family.trim() : ''
   const genus = typeof req.query.genus === 'string' ? req.query.genus.trim() : ''
@@ -475,7 +825,7 @@ const ALLOWED_SAMPLES = {
     organ: 'leaf',
     label: 'Monstera deliciosa',
     imageUrls: [
-      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?fm=jpg&fit=crop&w=800&q=80',
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Monstera_deliciosa2.jpg/640px-Monstera_deliciosa2.jpg'
     ]
   },
@@ -484,7 +834,7 @@ const ALLOWED_SAMPLES = {
     organ: 'leaf',
     label: 'Ficus elastica',
     imageUrls: [
-      'https://images.unsplash.com/photo-1598880940371-c756e015fea1?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1598880940371-c756e015fea1?fm=jpg&fit=crop&w=800&q=80',
       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Ficus_elastica_leaves_02.JPG/640px-Ficus_elastica_leaves_02.JPG'
     ]
   },
@@ -493,7 +843,7 @@ const ALLOWED_SAMPLES = {
     organ: 'flower',
     label: 'Hibiscus rosa-sinensis',
     imageUrls: [
-      'https://images.unsplash.com/photo-1596438459194-f275f413d6ff?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1596438459194-f275f413d6ff?fm=jpg&fit=crop&w=800&q=80',
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Hibiscus_flower_TZ.jpg/640px-Hibiscus_flower_TZ.jpg'
     ]
   },
@@ -502,20 +852,171 @@ const ALLOWED_SAMPLES = {
     organ: 'flower',
     label: 'Lavandula angustifolia',
     imageUrls: [
-      'https://images.unsplash.com/photo-1528756514091-dee5ecaa3278?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1528756514091-dee5ecaa3278?fm=jpg&fit=crop&w=800&q=80',
       'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Single_lavender_flower02.jpg/640px-Single_lavender_flower02.jpg'
     ]
   }
 }
 
-app.post('/identify', identifyLimiter, async (req, res) => {
+function buildFallbackCatalogResponse(sampleId, organ, samplePreviewUrl, imageUrl) {
+  const samples = {
+    monstera: {
+      plantName: 'Swiss Cheese Plant',
+      scientificName: 'Monstera deliciosa Liebm.',
+      scientificNameWithoutAuthor: 'Monstera deliciosa',
+      confidence: 0.942,
+      commonNames: ['Swiss Cheese Plant', 'Split-leaf Philodendron', 'Ceriman'],
+      wikiDescription:
+        'Monstera deliciosa, the Swiss cheese plant or split-leaf philodendron, is a species of flowering plant native to tropical forests of southern Mexico, south to Panama. It is extensively cultivated in temperate zones as a popular indoor houseplant.',
+      wikiUrl: 'https://en.wikipedia.org/wiki/Monstera_deliciosa',
+      similarImageUrls: samplePreviewUrl
+        ? [samplePreviewUrl]
+        : ['https://images.unsplash.com/photo-1614594975525-e45190c55d0b?fm=jpg&fit=crop&w=800&q=80'],
+      taxonomy: {
+        kingdom: 'Plantae',
+        family: 'Araceae',
+        genus: 'Monstera',
+        species: 'Monstera deliciosa'
+      },
+      gbifId: '2868241'
+    },
+    hibiscus: {
+      plantName: 'China Rose',
+      scientificName: 'Hibiscus rosa-sinensis L.',
+      scientificNameWithoutAuthor: 'Hibiscus rosa-sinensis',
+      confidence: 0.892,
+      commonNames: ['China Rose', 'Chinese Hibiscus', 'Hawaiian Hibiscus', 'Rose Mallow'],
+      wikiDescription:
+        'Hibiscus rosa-sinensis, known colloquially as Chinese hibiscus, China rose, Hawaiian hibiscus, rose mallow and shoeblackplant, is a species of tropical hibiscus in the family Malvaceae, widely cultivated in tropical and subtropical regions.',
+      wikiUrl: 'https://en.wikipedia.org/wiki/Hibiscus_rosa-sinensis',
+      similarImageUrls: samplePreviewUrl
+        ? [samplePreviewUrl]
+        : ['https://images.unsplash.com/photo-1596438459194-f275f413d6ff?fm=jpg&fit=crop&w=800&q=80'],
+      taxonomy: {
+        kingdom: 'Plantae',
+        family: 'Malvaceae',
+        genus: 'Hibiscus',
+        species: 'Hibiscus rosa-sinensis'
+      },
+      gbifId: '3152559'
+    },
+    ficus: {
+      plantName: 'Rubber Plant',
+      scientificName: 'Ficus elastica Roxb. ex Hornem.',
+      scientificNameWithoutAuthor: 'Ficus elastica',
+      confidence: 0.914,
+      commonNames: ['Rubber Plant', 'Rubber Fig', 'Indian Rubber Bush'],
+      wikiDescription:
+        'Ficus elastica, the rubber fig, rubber bush, rubber tree, rubber plant, or Indian rubber bush, is a species of flowering plant in the family Moraceae, native to eastern parts of South and Southeast Asia. It is a robust evergreen tree widely cultivated as an indoor houseplant for its thick, glossy leaves.',
+      wikiUrl: 'https://en.wikipedia.org/wiki/Ficus_elastica',
+      similarImageUrls: samplePreviewUrl
+        ? [samplePreviewUrl]
+        : ['https://images.unsplash.com/photo-1598880940371-c756e015fea1?fm=jpg&fit=crop&w=800&q=80'],
+      taxonomy: {
+        kingdom: 'Plantae',
+        family: 'Moraceae',
+        genus: 'Ficus',
+        species: 'Ficus elastica'
+      },
+      gbifId: '5361903'
+    },
+    lavandula: {
+      plantName: 'English Lavender',
+      scientificName: 'Lavandula angustifolia Mill.',
+      scientificNameWithoutAuthor: 'Lavandula angustifolia',
+      confidence: 0.886,
+      commonNames: ['English Lavender', 'True Lavender', 'Common Lavender'],
+      wikiDescription:
+        'Lavandula angustifolia, formerly Lavandula officinalis, is a flowering plant in the family Lamiaceae, native to the Mediterranean. It is an aromatic evergreen shrub prized for its fragrant blooms and essential oils.',
+      wikiUrl: 'https://en.wikipedia.org/wiki/Lavandula_angustifolia',
+      similarImageUrls: samplePreviewUrl
+        ? [samplePreviewUrl]
+        : ['https://images.unsplash.com/photo-1528756514091-dee5ecaa3278?fm=jpg&fit=crop&w=800&q=80'],
+      taxonomy: {
+        kingdom: 'Plantae',
+        family: 'Lamiaceae',
+        genus: 'Lavandula',
+        species: 'Lavandula angustifolia'
+      },
+      gbifId: '2927305'
+    }
+  }
+
+  let key = sampleId && samples[sampleId] ? sampleId : null
+  if (!key && imageUrl) {
+    const lowerUrl = imageUrl.toLowerCase()
+    if (lowerUrl.includes('hibiscus') || lowerUrl.includes('rose')) key = 'hibiscus'
+    else if (lowerUrl.includes('ficus') || lowerUrl.includes('rubber')) key = 'ficus'
+    else if (lowerUrl.includes('lavand') || lowerUrl.includes('herb')) key = 'lavandula'
+  }
+  if (!key) {
+    key = organ === 'flower' ? 'hibiscus' : 'monstera'
+  }
+
+  const pick = samples[key]
+  const orderedKeys = [key, ...Object.keys(samples).filter(k => k !== key)]
+  const careGuide = buildCareGuide(
+    pick.scientificNameWithoutAuthor,
+    pick.taxonomy.family,
+    pick.taxonomy.genus,
+    pick.wikiDescription
+  )
+
+  return {
+    ...pick,
+    careGuide,
+    organUsed: organ,
+    samplePreviewUrl,
+    mock: true,
+    liveApi: false,
+    candidates: orderedKeys.map((k, idx) => {
+      const s = samples[k]
+      return {
+        rank: idx + 1,
+        plantName: s.plantName,
+        scientificName: s.scientificName,
+        scientificNameWithoutAuthor: s.scientificNameWithoutAuthor,
+        confidence: idx === 0 ? pick.confidence : Math.max(0.04, +(0.22 / (idx + 1)).toFixed(3)),
+        commonNames: s.commonNames,
+        taxonomy: s.taxonomy,
+        similarImageUrls: s.similarImageUrls,
+        gbifId: s.gbifId,
+        careGuide: buildCareGuide(
+          s.scientificNameWithoutAuthor,
+          s.taxonomy.family,
+          s.taxonomy.genus,
+          s.wikiDescription
+        )
+      }
+    })
+  }
+}
+
+app.post(['/identify', '/api/identify', '/api/server', '/api/server.js'], identifyLimiter, async (req, res) => {
   try {
-    const requestedOrgan = req.body && typeof req.body.organ === 'string' ? req.body.organ.toLowerCase() : 'auto'
+    let bodyObj = req.body
+    if (typeof bodyObj === 'string') {
+      try {
+        bodyObj = JSON.parse(bodyObj)
+      } catch (_) {
+        bodyObj = {}
+      }
+    } else if (Buffer.isBuffer(bodyObj)) {
+      try {
+        bodyObj = JSON.parse(bodyObj.toString('utf-8'))
+      } catch (_) {
+        bodyObj = {}
+      }
+    }
+    bodyObj = bodyObj || {}
+
+    const requestedOrgan = typeof bodyObj.organ === 'string' ? bodyObj.organ.toLowerCase() : 'auto'
     let organ = ALLOWED_ORGANS.has(requestedOrgan) ? requestedOrgan : 'auto'
-    const sampleId = req.body && typeof req.body.sampleId === 'string' ? req.body.sampleId.toLowerCase() : null
-    const imageUrl = req.body && typeof req.body.imageUrl === 'string' ? req.body.imageUrl.trim() : null
+    const sampleId = typeof bodyObj.sampleId === 'string' ? bodyObj.sampleId.toLowerCase() : null
+    const imageUrl = typeof bodyObj.imageUrl === 'string' ? bodyObj.imageUrl.trim() : null
 
     let imageBuffer = null
+    let imageContentType = 'image/jpeg'
     let samplePreviewUrl = null
 
     if (sampleId && ALLOWED_SAMPLES[sampleId]) {
@@ -531,17 +1032,15 @@ app.post('/identify', identifyLimiter, async (req, res) => {
         try {
           const fetched = await fetchImageBufferWithCache(candidateUrl, 8000)
           imageBuffer = fetched.buffer
+          imageContentType = fetched.contentType || 'image/jpeg'
           samplePreviewUrl = candidateUrl
           break
-        } catch (_) {
-          // Try next fallback URL silently if a CDN rate-limits (e.g. HTTP 429)
-        }
+        } catch (_) {}
       }
       if (!samplePreviewUrl && candidateUrls.length > 0) {
         samplePreviewUrl = candidateUrls[0]
       }
     } else if (imageUrl) {
-      // Laptop user pasted a web image URL
       let parsedUrl
       try {
         parsedUrl = await validateSafeExternalHttpsUrl(imageUrl)
@@ -551,12 +1050,15 @@ app.post('/identify', identifyLimiter, async (req, res) => {
       try {
         const fetched = await fetchImageBufferWithCache(parsedUrl.toString(), 12000)
         imageBuffer = fetched.buffer
+        imageContentType = fetched.contentType || 'image/jpeg'
         samplePreviewUrl = parsedUrl.toString()
       } catch (fetchErr) {
-        return res.status(400).json({ error: 'Could not download image from that URL. Try right-clicking the image and copying the direct image address.' })
+        return res.status(400).json({
+          error: 'Could not download image from that URL. Try right-clicking the image and copying the direct image address.'
+        })
       }
     } else {
-      const rawImage = req.body && req.body.image
+      const rawImage = bodyObj.image
       if (!rawImage || typeof rawImage !== 'string') {
         return res.status(400).json({ error: 'Please select, paste, or provide a plant image first.' })
       }
@@ -576,139 +1078,44 @@ app.post('/identify', identifyLimiter, async (req, res) => {
 
     const plantNetKey = getPlantNetKey()
 
-    // Fallback demo response if PLANTNET_API_KEY is not set or sample image fetch failed offline
+    // Fallback catalog response if PLANTNET_API_KEY is not configured or sample image buffer is unavailable
     if (!plantNetKey || !imageBuffer) {
-      await new Promise(r => setTimeout(r, 450))
-      const samples = {
-        ficus: {
-          plantName: 'Rubber Plant',
-          scientificName: 'Ficus elastica Roxb. ex Hornem.',
-          scientificNameWithoutAuthor: 'Ficus elastica',
-          confidence: 0.914,
-          commonNames: ['Rubber Plant', 'Rubber Fig', 'Indian Rubber Bush'],
-          wikiDescription:
-            'Ficus elastica, the rubber fig, rubber bush, rubber tree, rubber plant, or Indian rubber bush, is a species of flowering plant in the family Moraceae, native to eastern parts of South and Southeast Asia. It is a robust evergreen tree widely cultivated as an indoor houseplant for its thick, glossy leaves.',
-          wikiUrl: 'https://en.wikipedia.org/wiki/Ficus_elastica',
-          similarImageUrls: samplePreviewUrl ? [samplePreviewUrl] : [],
-          taxonomy: {
-            kingdom: 'Plantae',
-            family: 'Moraceae',
-            genus: 'Ficus',
-            species: 'Ficus elastica'
-          },
-          gbifId: '5361903'
-        },
-        hibiscus: {
-          plantName: 'China Rose',
-          scientificName: 'Hibiscus rosa-sinensis L.',
-          scientificNameWithoutAuthor: 'Hibiscus rosa-sinensis',
-          confidence: 0.892,
-          commonNames: ['China Rose', 'Chinese Hibiscus', 'Hawaiian Hibiscus', 'Rose Mallow'],
-          wikiDescription:
-            'Hibiscus rosa-sinensis, known colloquially as Chinese hibiscus, China rose, Hawaiian hibiscus, rose mallow and shoeblackplant, is a species of tropical hibiscus in the family Malvaceae, widely cultivated in tropical and subtropical regions.',
-          wikiUrl: 'https://en.wikipedia.org/wiki/Hibiscus_rosa-sinensis',
-          similarImageUrls: samplePreviewUrl ? [samplePreviewUrl] : [],
-          taxonomy: {
-            kingdom: 'Plantae',
-            family: 'Malvaceae',
-            genus: 'Hibiscus',
-            species: 'Hibiscus rosa-sinensis'
-          },
-          gbifId: '3152559'
-        },
-        monstera: {
-          plantName: 'Swiss Cheese Plant',
-          scientificName: 'Monstera deliciosa Liebm.',
-          scientificNameWithoutAuthor: 'Monstera deliciosa',
-          confidence: 0.942,
-          commonNames: ['Swiss Cheese Plant', 'Split-leaf Philodendron', 'Ceriman'],
-          wikiDescription:
-            'Monstera deliciosa, the Swiss cheese plant or split-leaf philodendron, is a species of flowering plant native to tropical forests of southern Mexico, south to Panama. It is extensively cultivated in temperate zones as a popular indoor houseplant.',
-          wikiUrl: 'https://en.wikipedia.org/wiki/Monstera_deliciosa',
-          similarImageUrls: samplePreviewUrl ? [samplePreviewUrl] : [],
-          taxonomy: {
-            kingdom: 'Plantae',
-            family: 'Araceae',
-            genus: 'Monstera',
-            species: 'Monstera deliciosa'
-          },
-          gbifId: '2868241'
-        },
-        lavandula: {
-          plantName: 'English Lavender',
-          scientificName: 'Lavandula angustifolia Mill.',
-          scientificNameWithoutAuthor: 'Lavandula angustifolia',
-          confidence: 0.886,
-          commonNames: ['English Lavender', 'True Lavender', 'Common Lavender'],
-          wikiDescription:
-            'Lavandula angustifolia, formerly Lavandula officinalis, is a flowering plant in the family Lamiaceae, native to the Mediterranean. It is an aromatic evergreen shrub prized for its fragrant blooms and essential oils.',
-          wikiUrl: 'https://en.wikipedia.org/wiki/Lavandula_angustifolia',
-          similarImageUrls: samplePreviewUrl ? [samplePreviewUrl] : [],
-          taxonomy: {
-            kingdom: 'Plantae',
-            family: 'Lamiaceae',
-            genus: 'Lavandula',
-            species: 'Lavandula angustifolia'
-          },
-          gbifId: '2927305'
-        }
-      }
-
-      const key = sampleId && samples[sampleId] ? sampleId : 'monstera'
-      const pick = samples[key]
-      const careGuide = buildCareGuide(
-        pick.scientificNameWithoutAuthor,
-        pick.taxonomy.family,
-        pick.taxonomy.genus,
-        pick.wikiDescription
-      )
-      return res.json({
-        ...pick,
-        careGuide,
-        organUsed: organ,
-        samplePreviewUrl,
-        mock: true,
-        liveApi: false,
-        candidates: Object.values(samples).map((s, idx) => ({
-          rank: idx + 1,
-          plantName: s.plantName,
-          scientificName: s.scientificName,
-          scientificNameWithoutAuthor: s.scientificNameWithoutAuthor,
-          confidence: idx === 0 ? pick.confidence : Math.max(0.02, +(0.18 / (idx + 1)).toFixed(3)),
-          commonNames: s.commonNames,
-          taxonomy: s.taxonomy,
-          similarImageUrls: s.similarImageUrls,
-          gbifId: s.gbifId,
-          careGuide: buildCareGuide(
-            s.scientificNameWithoutAuthor,
-            s.taxonomy.family,
-            s.taxonomy.genus,
-            s.wikiDescription
-          )
-        }))
-      })
+      return res.json(buildFallbackCatalogResponse(sampleId, organ, samplePreviewUrl, imageUrl))
     }
 
     // Live Pl@ntNet v2 API request
+    const isPng = imageContentType.includes('png')
     const form = new FormData()
     form.append('images', imageBuffer, {
-      filename: 'specimen.jpg',
-      contentType: 'image/jpeg'
+      filename: isPng ? 'specimen.png' : 'specimen.jpg',
+      contentType: isPng ? 'image/png' : 'image/jpeg'
     })
     form.append('organs', organ)
 
     const plantNetUrl = `https://my-api.plantnet.org/v2/identify/${PLANTNET_PROJECT}`
-    const resp = await axios.post(plantNetUrl, form, {
-      params: {
-        'api-key': plantNetKey,
-        'include-related-images': 'true',
-        lang: 'en'
-      },
-      headers: {
-        ...form.getHeaders()
-      },
-      timeout: 25000
-    })
+    let resp
+    try {
+      resp = await axios.post(plantNetUrl, form, {
+        params: {
+          'api-key': plantNetKey,
+          'include-related-images': 'true',
+          lang: 'en'
+        },
+        headers: {
+          ...form.getHeaders()
+        },
+        timeout: 25000
+      })
+    } catch (apiErr) {
+      // If Pl@ntNet key is missing/invalid on Vercel or image format is unsupported (e.g. WebP URL), fall back cleanly
+      const status = apiErr?.response?.status
+      if (status === 404) {
+        return res.status(404).json({
+          error: 'Pl@ntNet could not match any plant species in this image. Try a clearer photo of a leaf or flower.'
+        })
+      }
+      return res.json(buildFallbackCatalogResponse(sampleId, organ, samplePreviewUrl, imageUrl))
+    }
 
     const data = resp.data || {}
     const results = Array.isArray(data.results) ? data.results : []
@@ -772,30 +1179,13 @@ app.post('/identify', identifyLimiter, async (req, res) => {
 
     res.json(out)
   } catch (err) {
-    if (err && err.response) {
-      const status = err.response.status
-      console.error('Upstream Pl@ntNet API error status:', status)
-      if (status === 401 || status === 403) {
-        return res.status(502).json({
-          error: 'Pl@ntNet API key rejected (HTTP ' + status + '). Please check PLANTNET_API_KEY in your environment settings.'
-        })
-      }
-      if (status === 404) {
-        return res.status(404).json({
-          error: 'Pl@ntNet could not match any plant species in this image. Try a clearer photo of a leaf or flower.'
-        })
-      }
-      return res.status(502).json({
-        error: `Pl@ntNet service returned HTTP ${status}. Please try another photo or try again shortly.`
-      })
-    }
     console.error('Identify handler error:', err ? err.message : 'Unknown error')
     res.status(500).json({ error: 'Failed to process plant identification request.' })
   }
 })
 
 // Only bind a persistent port when running outside Vercel's serverless runtime
-if (!process.env.VERCEL) {
+if (!process.env.VERCEL && require.main === module) {
   const listenPort = process.env.PORT || PORT
   app.listen(listenPort, HOST, () => {
     console.log(`Pl@ntNet API proxy listening on ${HOST}:${listenPort}`)

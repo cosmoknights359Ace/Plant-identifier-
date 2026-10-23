@@ -1,0 +1,5 @@
+# Copy this file to local.properties inside the app/ folder for local Android builds.
+# DO NOT commit local.properties to version control.
+# Set API_BASE_URL to your live Vercel URL (e.g. https://your-app.vercel.app) or http://10.0.2.2:3000 for local emulator.
+sdk.dir=/path/to/Android/sdk
+API_BASE_URL=http://10.0.2.2:3000

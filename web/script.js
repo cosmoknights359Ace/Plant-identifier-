@@ -399,6 +399,11 @@ function updateVaultStatsUI() {
 // 2. Identification & UI Logic
 // ============================================================================
 
+const identifierSection = document.getElementById('identifier')
+const navResultLink = document.getElementById('navResultLink')
+const backToIdentifyBtn = document.getElementById('backToIdentifyBtn')
+const resultUploadNewBtn = document.getElementById('resultUploadNewBtn')
+
 function showStatus(message, isError = true) {
   if (!statusBanner) return
   if (!message) {
@@ -421,6 +426,13 @@ function showLoader(show, customMessage = 'Analyzing plant features with Pl@ntNe
     inlineLoaderText.textContent = customMessage
   }
   inlineLoader.hidden = !show
+  if (identifierSection && identifierSection.hidden) {
+    if (show) {
+      showStatus(customMessage || 'Analyzing plant features with Pl@ntNet…', false)
+    } else if (statusBanner && statusBanner.classList.contains('info')) {
+      showStatus('')
+    }
+  }
   if (show) {
     _loaderTimeout = setTimeout(() => {
       inlineLoader.hidden = true
@@ -430,14 +442,125 @@ function showLoader(show, customMessage = 'Analyzing plant features with Pl@ntNe
   }
 }
 
-// Organ selector segmented buttons
+function setActiveNavLink(targetHash) {
+  document.querySelectorAll('.topnav .nav-link[data-nav]').forEach(link => {
+    link.classList.toggle('active-nav', link.getAttribute('data-nav') === targetHash)
+  })
+}
+
+function showIdentifierView(scrollToTargetId = 'identifier') {
+  if (identifierSection) {
+    identifierSection.hidden = false
+  }
+  if (resultSection) {
+    resultSection.hidden = true
+  }
+  setActiveNavLink(scrollToTargetId === 'specimens' ? '#specimens' : '#identifier')
+
+  requestAnimationFrame(() => {
+    if (scrollToTargetId === 'specimens') {
+      const specEl = document.getElementById('specimens')
+      if (specEl) {
+        specEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        return
+      }
+    }
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (_) {
+      window.scrollTo(0, 0)
+    }
+  })
+}
+
+function navigateToResultsView() {
+  if (!resultSection) return
+  if (identifierSection) {
+    identifierSection.hidden = true
+  }
+  resultSection.hidden = false
+  if (navResultLink) {
+    navResultLink.hidden = false
+  }
+  setActiveNavLink('#result')
+
+  resultSection.classList.remove('dossier-focus-flash')
+  void resultSection.offsetWidth
+  resultSection.classList.add('dossier-focus-flash')
+  setTimeout(() => {
+    resultSection.classList.remove('dossier-focus-flash')
+  }, 1200)
+
+  const scrollToResultsTop = () => {
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (_) {
+      window.scrollTo(0, 0)
+    }
+  }
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      scrollToResultsTop()
+      try {
+        resultSection.focus({ preventScroll: true })
+      } catch (_) {}
+    })
+  })
+
+  setTimeout(scrollToResultsTop, 120)
+}
+
+document.querySelectorAll('.topnav .nav-link[data-nav]').forEach(link => {
+  link.addEventListener('click', e => {
+    const targetHash = link.getAttribute('data-nav')
+    if (targetHash === '#identifier') {
+      e.preventDefault()
+      showIdentifierView('identifier')
+    } else if (targetHash === '#specimens') {
+      e.preventDefault()
+      showIdentifierView('specimens')
+    } else if (targetHash === '#result') {
+      e.preventDefault()
+      navigateToResultsView()
+    } else if (targetHash) {
+      setActiveNavLink(targetHash)
+    }
+  })
+})
+
+document.querySelectorAll('a.brand-wordmark, .mobile-bottom-nav a[href="#identifier"]').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault()
+    showIdentifierView('identifier')
+  })
+})
+
+function syncOrganButtonsUI(organValue) {
+  document.querySelectorAll('.seg-btn[data-organ]').forEach(b => {
+    b.classList.toggle('active', (b.getAttribute('data-organ') || 'auto') === organValue)
+  })
+}
+
+if (backToIdentifyBtn) {
+  backToIdentifyBtn.addEventListener('click', () => {
+    showIdentifierView('identifier')
+  })
+}
+
+if (resultUploadNewBtn) {
+  resultUploadNewBtn.addEventListener('click', () => {
+    fileInput.click()
+  })
+}
+
+// Organ selector segmented buttons (both in Identifier and in Results quickbar)
 document.querySelectorAll('.seg-btn[data-organ]').forEach(btn => {
   btn.addEventListener('click', async () => {
     const newOrgan = btn.getAttribute('data-organ') || 'auto'
     if (newOrgan === selectedOrgan) return
-    document.querySelectorAll('.seg-btn[data-organ]').forEach(b => b.classList.remove('active'))
-    btn.classList.add('active')
     selectedOrgan = newOrgan
+    syncOrganButtonsUI(selectedOrgan)
 
     if (currentBase64) {
       await runIdentification({ image: currentBase64, organ: selectedOrgan })
@@ -635,13 +758,19 @@ async function handleSelectedFile(file) {
 
 fileInput.addEventListener('change', async e => {
   const f = e.target.files && e.target.files[0]
-  if (f) await handleSelectedFile(f)
+  if (f) {
+    await handleSelectedFile(f)
+    fileInput.value = ''
+  }
 })
 
 if (cameraInput) {
   cameraInput.addEventListener('change', async e => {
     const f = e.target.files && e.target.files[0]
-    if (f) await handleSelectedFile(f)
+    if (f) {
+      await handleSelectedFile(f)
+      cameraInput.value = ''
+    }
   })
 }
 
@@ -682,7 +811,8 @@ if (dbgReset) {
     preview.classList.add('empty')
     preview.innerHTML = EMPTY_PLATE_HTML
     if (sanitizedBadge) sanitizedBadge.textContent = 'Private · Location stripped'
-    resultSection.hidden = true
+    if (navResultLink) navResultLink.hidden = true
+    showIdentifierView('identifier')
   })
 }
 
@@ -720,11 +850,18 @@ async function runIdentification(payload, loaderMsg) {
   showStatus('')
   showLoader(true, loaderMsg)
   try {
-    const res = await fetch('/identify', {
+    let res = await fetch('/identify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     })
+    if (res.status === 404 || res.status === 405) {
+      res = await fetch('/api/identify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+    }
     const json = await res.json().catch(() => null)
     if (!res.ok) {
       throw new Error((json && json.error) ? json.error : `Identification error (HTTP ${res.status})`)
@@ -739,13 +876,19 @@ async function runIdentification(payload, loaderMsg) {
       setPreviewImage(proxiedSample, `Plant Part Analyzed: ${(json.organUsed || selectedOrgan).toUpperCase()}`)
     }
 
+    // Hide the inline loader before rendering and scrolling so layout above #result doesn't shift mid-scroll
+    showLoader(false)
+
     lastIdentificationData = json
-    renderDossier(json)
+    renderDossier(json, false)
 
     // If Auto-Save is enabled and user uploaded/pasted their own image or URL, save automatically into their Personal Space!
     if (userPreferences.autoSave && (payload.image || payload.imageUrl)) {
       await recordCurrentPlantInPersonalSpace(true)
     }
+
+    // Automatically navigate & scroll to the Details / Results section once DOM updates are complete
+    navigateToResultsView()
   } catch (err) {
     showStatus(err.message || 'Identification request failed.', true)
   } finally {
@@ -761,7 +904,397 @@ function setConfidence(p) {
   confidenceBar.style.width = `${pct}%`
 }
 
-function renderCareStrip(careGuide) {
+// Plant Geek Suite DOM Elements & State
+const estIntervalValue = document.getElementById('estIntervalValue')
+const estDryBackValue = document.getElementById('estDryBackValue')
+const estVolumeValue = document.getElementById('estVolumeValue')
+const estWaterQualityValue = document.getElementById('estWaterQualityValue')
+const estNpkValue = document.getElementById('estNpkValue')
+const estDilutionValue = document.getElementById('estDilutionValue')
+const seasonalCalendarGrid = document.getElementById('seasonalCalendarGrid')
+const telePpfd = document.getElementById('telePpfd')
+const teleLux = document.getElementById('teleLux')
+const teleHumidity = document.getElementById('teleHumidity')
+const teleVpd = document.getElementById('teleVpd')
+const teleTemp = document.getElementById('teleTemp')
+const teleUsda = document.getElementById('teleUsda')
+const telePh = document.getElementById('telePh')
+const teleHabit = document.getElementById('teleHabit')
+const teleBiome = document.getElementById('teleBiome')
+const substrateBar = document.getElementById('substrateBar')
+const substrateLegend = document.getElementById('substrateLegend')
+const fnDiagnostic = document.getElementById('fnDiagnostic')
+const fnLookalike = document.getElementById('fnLookalike')
+const fnEtymology = document.getElementById('fnEtymology')
+const researchLinksBar = document.getElementById('researchLinksBar')
+
+let estimatorState = {
+  potSize: 'medium', // 'small' | 'medium' | 'large'
+  potMat: 'plastic', // 'terracotta' | 'plastic' | 'fabric'
+  env: 'indoor'      // 'indoor' | 'humid' | 'outdoor'
+}
+let activeGeekProfile = null
+
+function buildClientFallbackGeekProfile(scientificName, family, genus) {
+  const fam = (family || '').toLowerCase()
+  const gen = (genus || '').toLowerCase()
+  const cleanSpecies = (scientificName || 'Plantae').replace(/\s+[A-Z(].*$/, '').trim() || 'Plantae'
+
+  const isAroid =
+    fam === 'araceae' ||
+    ['monstera', 'philodendron', 'epipremnum', 'zamioculcas', 'spathiphyllum', 'aglaonema', 'colocasia', 'alocasia'].includes(gen)
+  const isFicus = gen === 'ficus' || fam === 'moraceae'
+  const isHibiscus = gen === 'hibiscus' || fam === 'malvaceae'
+  const isHerb = fam === 'lamiaceae' || ['lavandula', 'rosmarinus', 'salvia', 'mentha', 'ocimum', 'thymus'].includes(gen)
+  const isSucculent = fam === 'cactaceae' || fam === 'crassulaceae' || ['aloe', 'echeveria', 'sedum', 'haworthia', 'opuntia'].includes(gen)
+
+  if (isAroid) {
+    return {
+      telemetry: {
+        ppfdRange: '120–280 μmol/m²/s',
+        luxRange: '2,500–6,500 Lux (230–600 FC)',
+        humidityRange: '60–80% RH',
+        vpdRange: '0.7–1.0 kPa',
+        tempRange: '19–29°C (66–85°F)',
+        usdaZones: 'USDA Zones 10b–12',
+        soilPh: '5.5–6.5 (Acidic Aroid Range)',
+        growthHabit: 'Hemiepiphytic climbing liana / aroid',
+        nativeBiome: 'Neotropical humid rainforest understory'
+      },
+      substrateMix: [
+        { label: 'Chunky Pine / Orchid Bark', percent: 35 },
+        { label: 'Coarse Perlite / Pumice', percent: 25 },
+        { label: 'Coco Coir / Chips', percent: 25 },
+        { label: 'Worm Castings & Charcoal', percent: 15 }
+      ],
+      wateringBase: {
+        baseIntervalDays: 8,
+        dryBackPercent: '50–70% airy matrix dry',
+        baseVolumeMl: 360,
+        npkRatio: '3-1-2 Foliage Ratio + Cal-Mag',
+        fertilizerDilution: 'Weakly-weekly at 1/4–1/2 strength (EC 0.9–1.3 mS/cm)',
+        waterQualityNote: 'Low-mineral water (<120 ppm TDS) prevents leaf-tip guttation burn'
+      },
+      seasonalCalendar: {
+        spring: {
+          season: 'Spring (Mar–May)',
+          phase: 'Cataphyll Unfurling & Root Surge',
+          waterNote: 'Hydrate thoroughly when top 5 cm of chunky bark mix dries.',
+          feedNote: 'Start 3-1-2 liquid foliage feed + silica for cell wall strength.',
+          actionTip: 'Anchor aerial roots into a damp sphagnum moss pole to trigger larger fenestrations.'
+        },
+        summer: {
+          season: 'Summer (Jun–Aug)',
+          phase: 'Maximum Fenestration & Canopy Jump',
+          waterNote: 'Keep moss pole evenly damp and drench substrate every 6–8 days.',
+          feedNote: 'Feed every other watering; flush substrate with plain water monthly.',
+          actionTip: 'Wipe broad lamina every 2 weeks and keep RH >60% so new leaves unfurl cleanly.'
+        },
+        autumn: {
+          season: 'Autumn (Sep–Nov)',
+          phase: 'Internode Slowdown',
+          waterNote: 'Allow top 60% of pot volume to dry before re-saturating.',
+          feedNote: 'Reduce feed to once a month at 1/4 dilution.',
+          actionTip: 'Inspect petiole crevices and abaxial leaf surfaces for thrips before winter.'
+        },
+        winter: {
+          season: 'Winter (Dec–Feb)',
+          phase: 'Tropical Understory Rest',
+          waterNote: 'Extend interval to 10–14 days; never let pot sit in cold runoff water.',
+          feedNote: 'Withhold NPK unless under >150 μmol/m²/s supplemental grow lights.',
+          actionTip: 'Run a humidifier nearby if indoor heating drops RH below 40%.'
+        }
+      },
+      fieldNotes: {
+        diagnosticTraits: 'Spadix inflorescence with spathe bract; calcium oxalate raphides; mature blades often exhibit pinnatifid lobes, fenestrations, or swollen petiole geniculum.',
+        lookalikeNote: 'Distinguish from Epipremnum pinnatum or Rhaphidophora tetrasperma ("Mini Monstera") by petiole geniculum morphology and lamina thickness.',
+        botanicalEtymology: 'Family Araceae; adapted to dappled rainforest understory light flecks and vertical trunk climbing.'
+      },
+      researchLinks: {
+        powo: `https://powo.science.kew.org/results?q=${encodeURIComponent(cleanSpecies)}`,
+        gbif: `https://www.gbif.org/species/search?q=${encodeURIComponent(cleanSpecies)}`,
+        inaturalist: `https://www.inaturalist.org/taxa/search?q=${encodeURIComponent(cleanSpecies)}`
+      }
+    }
+  }
+
+  return {
+    telemetry: {
+      ppfdRange: isHerb || isHibiscus || isSucculent ? '450–900+ μmol/m²/s' : '180–400 μmol/m²/s',
+      luxRange: isHerb || isHibiscus || isSucculent ? '18,000–50,000 Lux (Full Sun)' : '3,500–12,000 Lux',
+      humidityRange: isHerb || isSucculent ? '30–50% RH' : '50–70% RH',
+      vpdRange: isHerb || isSucculent ? '1.1–1.6 kPa' : '0.8–1.2 kPa',
+      tempRange: '18–28°C (65–82°F)',
+      usdaZones: isHerb ? 'USDA Zones 5–9' : 'USDA Zones 9–11',
+      soilPh: isHerb ? '6.5–7.5 (Neutral / Calcareous)' : '6.0–6.8 (Slightly Acidic)',
+      growthHabit: isFicus ? 'Evergreen lactiferous woody tree' : isHerb ? 'Aromatic perennial subshrub' : 'Vascular botanical specimen',
+      nativeBiome: isHerb ? 'Mediterranean rocky slopes' : 'Subtropical & tropical woodland margins'
+    },
+    substrateMix: isSucculent || isHerb
+      ? [
+          { label: 'Pumice / Coarse Silica Grit', percent: 45 },
+          { label: 'Perlite / Crushed Stone', percent: 25 },
+          { label: 'Screened Garden Loam', percent: 20 },
+          { label: 'Aged Compost', percent: 10 }
+        ]
+      : [
+          { label: 'Screened Loam / Compost', percent: 40 },
+          { label: 'Coco Coir / Peat Moss', percent: 25 },
+          { label: 'Perlite / Pumice', percent: 25 },
+          { label: 'Pine Bark & Biochar', percent: 10 }
+        ],
+    wateringBase: {
+      baseIntervalDays: isSucculent ? 15 : isHerb ? 11 : isHibiscus ? 4 : 7,
+      dryBackPercent: isSucculent || isHerb ? '85–100% bone dry between soaks' : '45–60% top volume dry',
+      baseVolumeMl: isSucculent || isHerb ? 260 : 380,
+      npkRatio: isHibiscus ? '10-4-12 High-K Bloom' : isHerb || isSucculent ? 'Low-N 2-6-6' : 'Balanced 10-10-10 or 3-1-2',
+      fertilizerDilution: '1/2 strength (EC 1.0–1.3 mS/cm) every 2–3 weeks in active growth',
+      waterQualityNote: 'Dechlorinated tap or rainwater at room temperature; ensure rapid drainage'
+    },
+    seasonalCalendar: {
+      spring: {
+        season: 'Spring (Mar–May)',
+        phase: 'Meristem Flush & Repotting',
+        waterNote: 'Increase hydration by ~25% as new root tips and shoots emerge.',
+        feedNote: 'Begin half-strength NPK feeding every 2–3 weeks.',
+        actionTip: 'Optimal window to repot into fresh substrate, prune leggy stems, and take cuttings.'
+      },
+      summer: {
+        season: 'Summer (Jun–Aug)',
+        phase: 'Peak Photosynthesis & Growth',
+        waterNote: 'Peak transpiration—check soil moisture every 4–6 days and flush salts mid-season.',
+        feedNote: 'Regular bi-weekly feeding + trace micronutrients.',
+        actionTip: 'Maintain strong air circulation and shield tender foliage from afternoon glass heat.'
+      },
+      autumn: {
+        season: 'Autumn (Sep–Nov)',
+        phase: 'Hardening Off & Metabolic Taper',
+        waterNote: 'Lengthen watering interval by 25–35% as daylight hours shorten.',
+        feedNote: 'Taper off nitrogen; final light potassium boost in early autumn.',
+        actionTip: 'Inspect thoroughly for pests before bringing outdoor containers inside.'
+      },
+      winter: {
+        season: 'Winter (Dec–Feb)',
+        phase: 'Quiescence / Winter Rest',
+        waterNote: 'Allow 65–80% soil dry-back; cold wet roots rapidly invite root rot.',
+        feedNote: 'Pause fertilizer unless growing under 12+ hrs of full-spectrum LED grow lights.',
+        actionTip: 'Keep clear of dry heating vents and freezing window panes.'
+      }
+    },
+    fieldNotes: {
+      diagnosticTraits: 'Examine leaf arrangement (phyllotaxy), venation geometry, petiole attachment, and floral bract structure for species confirmation.',
+      lookalikeNote: `Compare leaf margin serration and stem pubescence against closely related species in ${family || 'this family'}.`,
+      botanicalEtymology: `Classified under genus ${genus || 'Plantae'} (${family || 'Angiosperms'}); morphology reflects native habitat light and moisture availability.`
+    },
+    researchLinks: {
+      powo: `https://powo.science.kew.org/results?q=${encodeURIComponent(cleanSpecies)}`,
+      gbif: `https://www.gbif.org/species/search?q=${encodeURIComponent(cleanSpecies)}`,
+      inaturalist: `https://www.inaturalist.org/taxa/search?q=${encodeURIComponent(cleanSpecies)}`
+    }
+  }
+}
+
+function updateWateringEstimatorUI() {
+  if (!activeGeekProfile || !activeGeekProfile.wateringBase) return
+  const wb = activeGeekProfile.wateringBase
+  const baseDays = Number(wb.baseIntervalDays) || 7
+  const baseVol = Number(wb.baseVolumeMl) || 350
+
+  const sizeDaysMult = estimatorState.potSize === 'small' ? 0.72 : estimatorState.potSize === 'large' ? 1.35 : 1.0
+  const matDaysMult = estimatorState.potMat === 'terracotta' ? 0.78 : estimatorState.potMat === 'fabric' ? 0.72 : 1.0
+  const envDaysMult = estimatorState.env === 'humid' ? 1.28 : estimatorState.env === 'outdoor' ? 0.74 : 1.0
+
+  const calcDays = Math.max(2, Math.round(baseDays * sizeDaysMult * matDaysMult * envDaysMult))
+  const minDays = Math.max(2, calcDays - 1)
+  const maxDays = calcDays + 1
+
+  const sizeVolMult = estimatorState.potSize === 'small' ? 0.45 : estimatorState.potSize === 'large' ? 2.15 : 1.0
+  const matVolMult = estimatorState.potMat === 'terracotta' ? 1.1 : estimatorState.potMat === 'fabric' ? 1.15 : 1.0
+  const calcVolMl = Math.round((baseVol * sizeVolMult * matVolMult) / 10) * 10
+  const cups = (calcVolMl / 240).toFixed(1)
+
+  if (estIntervalValue) {
+    estIntervalValue.textContent = `Every ${minDays}–${maxDays} days`
+  }
+  if (estDryBackValue) {
+    const matNote =
+      estimatorState.potMat === 'terracotta'
+        ? 'porous clay breathes fast'
+        : estimatorState.potMat === 'fabric'
+        ? 'high side-wall aeration'
+        : 'retains moisture longer'
+    estDryBackValue.textContent = `Target: ${wb.dryBackPercent} (${matNote})`
+  }
+  if (estVolumeValue) {
+    estVolumeValue.textContent = `${calcVolMl} mL (~${cups} cups)`
+  }
+  if (estWaterQualityValue) {
+    estWaterQualityValue.textContent = wb.waterQualityNote || 'Water until 10–15% runoff drains from bottom'
+  }
+  if (estNpkValue) {
+    estNpkValue.textContent = wb.npkRatio || 'Balanced 10-10-10'
+  }
+  if (estDilutionValue) {
+    estDilutionValue.textContent = wb.fertilizerDilution || '1/2 strength every 2–3 weeks in active growth'
+  }
+}
+
+document.querySelectorAll('.est-pot-size').forEach(btn => {
+  btn.addEventListener('click', () => {
+    estimatorState.potSize = btn.getAttribute('data-pot-size') || 'medium'
+    document.querySelectorAll('.est-pot-size').forEach(b => b.classList.toggle('active', b === btn))
+    updateWateringEstimatorUI()
+  })
+})
+
+document.querySelectorAll('.est-pot-mat').forEach(btn => {
+  btn.addEventListener('click', () => {
+    estimatorState.potMat = btn.getAttribute('data-pot-mat') || 'plastic'
+    document.querySelectorAll('.est-pot-mat').forEach(b => b.classList.toggle('active', b === btn))
+    updateWateringEstimatorUI()
+  })
+})
+
+document.querySelectorAll('.est-env').forEach(btn => {
+  btn.addEventListener('click', () => {
+    estimatorState.env = btn.getAttribute('data-est-env') || 'indoor'
+    document.querySelectorAll('.est-env').forEach(b => b.classList.toggle('active', b === btn))
+    updateWateringEstimatorUI()
+  })
+})
+
+function renderPlantGeekDossier(careGuide, scientificName, family, genus) {
+  const gp =
+    (careGuide && careGuide.geekProfile) ||
+    buildClientFallbackGeekProfile(scientificName, family, genus)
+  activeGeekProfile = gp
+
+  // 1. Update Interactive Watering Estimator
+  updateWateringEstimatorUI()
+
+  // 2. Render 12-Month Seasonal Care & Phenology Calendar
+  if (seasonalCalendarGrid && gp.seasonalCalendar) {
+    seasonalCalendarGrid.textContent = ''
+    const order = [
+      ['spring', gp.seasonalCalendar.spring],
+      ['summer', gp.seasonalCalendar.summer],
+      ['autumn', gp.seasonalCalendar.autumn],
+      ['winter', gp.seasonalCalendar.winter]
+    ]
+    order.forEach(([key, item]) => {
+      if (!item) return
+      const card = document.createElement('div')
+      card.className = `season-card season-${key}`
+
+      const titleRow = document.createElement('div')
+      titleRow.className = 'season-title-row'
+      const sName = document.createElement('span')
+      sName.className = 'season-name'
+      sName.textContent = item.season || key.toUpperCase()
+      const sPhase = document.createElement('span')
+      sPhase.className = 'season-phase'
+      sPhase.textContent = item.phase || ''
+      titleRow.appendChild(sName)
+      titleRow.appendChild(sPhase)
+
+      const wP = document.createElement('p')
+      wP.className = 'season-detail-item'
+      const wStrong = document.createElement('strong')
+      wStrong.textContent = 'Water: '
+      wP.appendChild(wStrong)
+      wP.appendChild(document.createTextNode(item.waterNote || ''))
+
+      const fP = document.createElement('p')
+      fP.className = 'season-detail-item'
+      const fStrong = document.createElement('strong')
+      fStrong.textContent = 'Feed: '
+      fP.appendChild(fStrong)
+      fP.appendChild(document.createTextNode(item.feedNote || ''))
+
+      const aP = document.createElement('p')
+      aP.className = 'season-detail-item'
+      const aStrong = document.createElement('strong')
+      aStrong.textContent = 'Focus: '
+      aP.appendChild(aStrong)
+      aP.appendChild(document.createTextNode(item.actionTip || ''))
+
+      card.appendChild(titleRow)
+      card.appendChild(wP)
+      card.appendChild(fP)
+      card.appendChild(aP)
+      seasonalCalendarGrid.appendChild(card)
+    })
+  }
+
+  // 3. Render Precision Telemetry & Substrate Formula Bar
+  const tele = gp.telemetry || {}
+  if (telePpfd) telePpfd.textContent = tele.ppfdRange || '150–350 μmol/m²/s'
+  if (teleLux) teleLux.textContent = tele.luxRange || '3,000–10,000 Lux'
+  if (teleHumidity) teleHumidity.textContent = tele.humidityRange || '50–70% RH'
+  if (teleVpd) teleVpd.textContent = `VPD Target: ${tele.vpdRange || '0.8–1.2 kPa'}`
+  if (teleTemp) teleTemp.textContent = tele.tempRange || '18–28°C (65–82°F)'
+  if (teleUsda) teleUsda.textContent = tele.usdaZones || 'USDA Zones 9–11'
+  if (telePh) telePh.textContent = `pH ${tele.soilPh || '6.0–6.8'}`
+  if (teleHabit) teleHabit.textContent = tele.growthHabit || 'Perennial vascular specimen'
+  if (teleBiome) teleBiome.textContent = `Native Biome: ${tele.nativeBiome || 'Subtropical woodland'}`
+
+  const mix = Array.isArray(gp.substrateMix) ? gp.substrateMix : []
+  if (substrateBar && substrateLegend) {
+    substrateBar.textContent = ''
+    substrateLegend.textContent = ''
+    const colors = ['#15472E', '#107C41', '#D97706', '#6B8E78']
+    mix.forEach((comp, idx) => {
+      const pct = Number(comp.percent) || 25
+      const seg = document.createElement('div')
+      seg.className = `substrate-seg substrate-seg-${idx % 4}`
+      seg.style.width = `${pct}%`
+      seg.title = `${comp.label}: ${pct}%`
+      substrateBar.appendChild(seg)
+
+      const leg = document.createElement('span')
+      leg.className = 'substrate-legend-item'
+      const dot = document.createElement('span')
+      dot.className = 'substrate-dot'
+      dot.style.backgroundColor = colors[idx % colors.length]
+      const pctSpan = document.createElement('span')
+      pctSpan.className = 'substrate-pct'
+      pctSpan.textContent = `${pct}%`
+      const lblSpan = document.createElement('span')
+      lblSpan.textContent = comp.label || 'Media'
+      leg.appendChild(dot)
+      leg.appendChild(pctSpan)
+      leg.appendChild(lblSpan)
+      substrateLegend.appendChild(leg)
+    })
+  }
+
+  // 4. Render Botanical Field Notes & External Research Links
+  const fn = gp.fieldNotes || {}
+  if (fnDiagnostic) fnDiagnostic.textContent = fn.diagnosticTraits || ''
+  if (fnLookalike) fnLookalike.textContent = fn.lookalikeNote || ''
+  if (fnEtymology) fnEtymology.textContent = fn.botanicalEtymology || ''
+
+  if (researchLinksBar && gp.researchLinks) {
+    researchLinksBar.textContent = ''
+    const links = [
+      ['Kew POWO ↗', gp.researchLinks.powo],
+      ['GBIF Taxonomy ↗', gp.researchLinks.gbif],
+      ['iNaturalist ↗', gp.researchLinks.inaturalist]
+    ]
+    links.forEach(([label, href]) => {
+      if (!href || !href.startsWith('https://')) return
+      const a = document.createElement('a')
+      a.href = href
+      a.target = '_blank'
+      a.rel = 'noopener noreferrer'
+      a.className = 'research-ext-link'
+      a.textContent = label
+      researchLinksBar.appendChild(a)
+    })
+  }
+}
+
+function renderCareStrip(careGuide, scientificName, family, genus) {
   const cg = careGuide || {}
   if (careSunlight) {
     careSunlight.textContent = cg.sunlight || 'Bright indirect light to partial sun'
@@ -797,6 +1330,8 @@ function renderCareStrip(careGuide) {
       cg.propagationAndClimate ||
       'Propagate by stem cuttings, root division, or seed in spring; thrives best at 18–28 °C (65–82 °F) protected from frost.'
   }
+
+  renderPlantGeekDossier(cg, scientificName, family, genus)
 }
 
 function renderSafeDescription(container, text, wikiUrl) {
@@ -918,7 +1453,12 @@ function applyCandidateToDossier(candidate, rootData) {
   taxonomyEl.textContent = metaParts.join(' · ')
 
   renderTaxonomyDefinitionList(tax, candidate.gbifId, rootData.organUsed)
-  renderCareStrip(candidate.careGuide || rootData.careGuide)
+  renderCareStrip(
+    candidate.careGuide || rootData.careGuide,
+    candidate.scientificNameWithoutAuthor || candidate.scientificName || rootData.scientificName,
+    tax.family,
+    tax.genus
+  )
 
   const commons = Array.isArray(candidate.commonNames) ? candidate.commonNames : []
   commonEl.textContent = commons.length ? commons.join(' · ') : 'No additional common names listed'
@@ -926,7 +1466,7 @@ function applyCandidateToDossier(candidate, rootData) {
   renderSimilarGallery(candidate.similarImageUrls, candidate.scientificNameWithoutAuthor)
 }
 
-function renderDossier(data) {
+function renderDossier(data, autoScroll = true) {
   const candidates =
     Array.isArray(data.candidates) && data.candidates.length
       ? data.candidates
@@ -946,6 +1486,8 @@ function renderDossier(data) {
         ]
 
   resultSection.hidden = false
+  if (navResultLink) navResultLink.hidden = false
+  syncOrganButtonsUI(selectedOrgan)
   applyCandidateToDossier(candidates[0], data)
   renderSafeDescription(descEl, data.wikiDescription, data.wikiUrl)
 
@@ -1010,11 +1552,19 @@ function renderDossier(data) {
               family: cand.taxonomy?.family || '',
               genus: cand.taxonomy?.genus || ''
             })
-            const wRes = await fetch('/wiki-summary?' + params.toString())
+            let wRes = await fetch('/wiki-summary?' + params.toString())
+            if (wRes.status === 404 || wRes.status === 405) {
+              wRes = await fetch('/api/wiki-summary?' + params.toString())
+            }
             const wJson = await wRes.json()
             if (wJson.careGuide) {
               cand.careGuide = wJson.careGuide
-              renderCareStrip(wJson.careGuide)
+              renderCareStrip(
+                wJson.careGuide,
+                cand.scientificNameWithoutAuthor || cand.scientificName,
+                cand.taxonomy?.family,
+                cand.taxonomy?.genus
+              )
             }
             renderSafeDescription(descEl, wJson.extract, wJson.url)
           } catch (_) {
@@ -1027,7 +1577,9 @@ function renderDossier(data) {
     })
   }
 
-  resultSection.scrollIntoView({ behavior: 'smooth' })
+  if (autoScroll) {
+    navigateToResultsView()
+  }
 }
 
 function openLightbox(url, captionText) {
@@ -1470,5 +2022,70 @@ window.addEventListener('DOMContentLoaded', async () => {
   renderCollection()
   openTipScreen()
 })
+
+// ============================================================================
+// 5. Progressive Web App (PWA) Android & Mobile Installability + Offline Mode
+// ============================================================================
+const installAppBtn = document.getElementById('installAppBtn')
+let deferredInstallPrompt = null
+
+const isStandaloneMode =
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true
+
+const isIOSDevice = /iphone|ipad|ipod/i.test(window.navigator.userAgent || '')
+
+if (!isStandaloneMode && isIOSDevice && installAppBtn) {
+  installAppBtn.hidden = false
+  installAppBtn.textContent = 'Install App'
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault()
+  deferredInstallPrompt = e
+  if (!isStandaloneMode && installAppBtn) {
+    installAppBtn.hidden = false
+  }
+})
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null
+  if (installAppBtn) {
+    installAppBtn.hidden = true
+  }
+  showStatus('VxPlants installed! You can now launch it from your phone home screen.', false)
+})
+
+if (installAppBtn) {
+  installAppBtn.addEventListener('click', async () => {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt()
+      const choice = await deferredInstallPrompt.userChoice.catch(() => null)
+      if (choice && choice.outcome === 'accepted') {
+        installAppBtn.hidden = true
+      }
+      deferredInstallPrompt = null
+    } else if (isIOSDevice) {
+      showStatus('To install VxPlants: tap the Share button in Safari, then tap "Add to Home Screen".', false)
+    } else {
+      showStatus('To install on Android: open your browser menu (⋮) and tap "Add to Home screen" or "Install app".', false)
+    }
+  })
+}
+
+window.addEventListener('offline', () => {
+  showStatus('Offline Mode — Your saved plants and notes in My Garden remain available.', false)
+})
+
+window.addEventListener('online', () => {
+  showStatus('')
+})
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  })
+}
+
 
 

@@ -1,18 +1,17 @@
 {
   "version": 2,
-  "outputDirectory": ".",
   "rewrites": [
     {
       "source": "/identify",
-      "destination": "/api/server.js"
+      "destination": "/api/identify"
     },
     {
       "source": "/wiki-summary",
-      "destination": "/api/server.js"
+      "destination": "/api/wiki-summary"
     },
     {
       "source": "/image-proxy",
-      "destination": "/api/server.js"
+      "destination": "/api/image-proxy"
     }
   ]
 }

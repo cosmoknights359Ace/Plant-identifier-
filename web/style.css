@@ -43,7 +43,13 @@
   display: none !important;
 }
 
-html, body {
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-canvas);
@@ -55,7 +61,15 @@ html, body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeSpeed;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+#identifier,
+#result,
+#specimens,
+#personalSpaceSection,
+#guideSection {
+  scroll-margin-top: 84px;
 }
 
 /* ==========================================================================
@@ -118,7 +132,8 @@ html, body {
 }
 
 .nav-link:hover,
-.nav-link:focus-visible {
+.nav-link:focus-visible,
+.nav-link.active-nav {
   color: #FFFFFF;
   border-bottom-color: #10B981;
 }
@@ -684,8 +699,45 @@ button:active:not(:disabled),
   border: 1px solid #C4D2C8;
   border-top: 4px solid var(--accent-forest);
   border-radius: 14px;
-  padding: 36px;
+  padding: 28px 36px 36px;
   box-shadow: 0 4px 20px rgba(14, 47, 30, 0.05);
+  outline: none;
+  transition: box-shadow 300ms ease, border-color 300ms ease;
+}
+
+.dossier-section.dossier-focus-flash {
+  box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.28), 0 12px 32px rgba(14, 47, 30, 0.12);
+}
+
+.results-nav-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #B5C6BA;
+}
+
+.results-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.results-organ-Quickbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 7px 14px;
+  font-size: 13px;
 }
 
 .dossier-header {
@@ -844,6 +896,286 @@ button:active:not(:disabled),
 .agri-item {
   background-color: var(--bg-elevated);
   border-left: 3px solid var(--accent-emerald);
+}
+
+/* ==========================================================================
+   3B. Plant Geek Suite: Estimator, Seasonal Calendar, Telemetry & Field Notes
+   ========================================================================== */
+.geek-estimator-block,
+.geek-calendar-block,
+.geek-telemetry-block,
+.geek-fieldnotes-block {
+  padding: 22px 0 24px 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.estimator-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.estimator-control-group {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.estimator-control-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+
+.estimator-readout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.estimator-metric-card {
+  background-color: #EDF6F0;
+  border: 1px solid #BCD8C6;
+  border-left: 4px solid var(--accent-forest);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.estimator-metric-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-emerald);
+}
+
+.estimator-metric-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.estimator-metric-sub {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+
+/* 12-Month Seasonal Care & Phenology Calendar */
+.seasonal-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.season-card {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-top: 3px solid var(--accent-forest);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.season-card.season-summer {
+  border-top-color: #D97706;
+  background-color: #FDF9F1;
+}
+
+.season-card.season-autumn {
+  border-top-color: #B45309;
+}
+
+.season-card.season-winter {
+  border-top-color: #3B6E5C;
+}
+
+.season-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-hairline);
+}
+
+.season-name {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-forest);
+}
+
+.season-phase {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.season-detail-item {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+  margin: 0;
+}
+
+.season-detail-item strong {
+  color: var(--ink-primary);
+  font-weight: 600;
+}
+
+/* Precision Grower Telemetry & Substrate Formula */
+.telemetry-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.telemetry-item {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.telemetry-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.telemetry-sub {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
+
+.substrate-recipe-box {
+  background-color: #FAF6EE;
+  border: 1px solid #DFD5C0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.substrate-recipe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.substrate-recipe-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.substrate-biome-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-forest);
+}
+
+.substrate-stacked-bar {
+  display: flex;
+  height: 14px;
+  width: 100%;
+  border-radius: 7px;
+  overflow: hidden;
+  background-color: #E2DDD2;
+  margin-bottom: 10px;
+}
+
+.substrate-seg {
+  height: 100%;
+  transition: width 250ms ease;
+}
+
+.substrate-seg-0 { background-color: #15472E; }
+.substrate-seg-1 { background-color: #107C41; }
+.substrate-seg-2 { background-color: #D97706; }
+.substrate-seg-3 { background-color: #6B8E78; }
+
+.substrate-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.substrate-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
+
+.substrate-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.substrate-pct {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+/* Botanical Field Notes & Research Links */
+.fieldnotes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.research-links-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.research-ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-forest);
+  background-color: #E6F0EA;
+  border: 1px solid #BCD4C5;
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+
+.research-ext-link:hover {
+  background-color: #D3E6DA;
 }
 
 /* Dossier 2-Column Content Grid */
@@ -1558,8 +1890,15 @@ button:active:not(:disabled),
     padding-right: 0;
     border-right: none;
   }
-  .care-strip {
+  .care-strip,
+  .seasonal-calendar-grid,
+  .telemetry-metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .estimator-controls-grid,
+  .estimator-readout-grid,
+  .fieldnotes-grid {
+    grid-template-columns: 1fr;
   }
   .dossier-grid {
     grid-template-columns: 1fr;
@@ -1577,13 +1916,14 @@ button:active:not(:disabled),
     gap: 12px;
   }
   .topnav,
-  .topbar-tour-btn {
+  #topTipsBtn {
     display: none;
   }
-  .topbar-action .btn-primary {
+  .topbar-action .btn-primary,
+  #installAppBtn {
     min-height: 36px;
-    padding: 8px 14px;
-    font-size: 13px;
+    padding: 8px 12px;
+    font-size: 12.5px;
   }
 
   /* Leave room at bottom for Fixed Thumb-Zone Navigation Bar */
@@ -1644,12 +1984,17 @@ button:active:not(:disabled),
     width: 100%;
   }
 
-  .care-strip {
+  .care-strip,
+  .telemetry-metrics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
-  .agri-grid {
+  .agri-grid,
+  .seasonal-calendar-grid,
+  .estimator-controls-grid,
+  .estimator-readout-grid,
+  .fieldnotes-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }

@@ -3,11 +3,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <meta name="theme-color" content="#14452B" />
+  <meta name="theme-color" content="#0E2F1E" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="VxPlants" />
   <title>VxPlants — Instant Plant ID &amp; Care Guide</title>
   <meta name="description" content="Identify houseplants, flowers, and trees in seconds on mobile or desktop. Get simple care instructions and keep your own personal plant journal." />
   <meta property="og:title" content="VxPlants — Instant Plant ID &amp; Care Guide" />
   <meta property="og:description" content="Identify houseplants, flowers, and trees in seconds on mobile or desktop. Get simple care instructions and keep your own personal plant journal." />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -19,14 +26,16 @@
     <a href="#identifier" class="brand-wordmark">VxPlants</a>
 
     <nav class="topnav" aria-label="Primary Navigation">
-      <a href="#identifier" class="nav-link">Identify</a>
-      <a href="#specimens" class="nav-link">Sample Plants</a>
-      <a href="#personalSpaceSection" class="nav-link">My Garden</a>
-      <a href="#guideSection" class="nav-link">How It Works</a>
+      <a href="#identifier" class="nav-link active-nav" data-nav="#identifier">Identify</a>
+      <a href="#result" id="navResultLink" class="nav-link" data-nav="#result" hidden>Plant Results</a>
+      <a href="#specimens" class="nav-link" data-nav="#specimens">Sample Plants</a>
+      <a href="#personalSpaceSection" class="nav-link" data-nav="#personalSpaceSection">My Garden</a>
+      <a href="#guideSection" class="nav-link" data-nav="#guideSection">How It Works</a>
       <button id="navTipsBtn" type="button" class="nav-link nav-link-btn">Feature Guide &amp; Tips</button>
     </nav>
 
     <div class="topbar-action">
+      <button id="installAppBtn" type="button" class="btn-secondary topbar-tour-btn" hidden>Install App</button>
       <button id="topTipsBtn" type="button" class="btn-secondary topbar-tour-btn">Quick Tour</button>
       <button id="topUploadBtn" type="button" class="btn-primary topbar-upload-btn">Upload Photo</button>
     </div>
@@ -44,16 +53,44 @@
               Snap a photo with your phone, drop an image from your computer, or tap a sample plant below for instant care tips.
             </p>
           </div>
-          <img
-            src="groot.svg"
-            alt="Groot plant mascot"
-            title="I am Groot!"
+          <svg
             class="groot-mascot-pic"
+            viewBox="0 0 120 120"
             width="80"
             height="80"
-            decoding="async"
-            referrerPolicy="no-referrer"
-          />
+            role="img"
+            aria-label="Baby Groot plant mascot"
+            fill="none"
+          >
+            <title>I am Groot!</title>
+            <circle cx="60" cy="60" r="56" fill="#E6F0EA" stroke="#15472E" stroke-width="2.5"/>
+            <circle cx="60" cy="60" r="48" fill="#F6F7F5"/>
+            <path d="M36 26C28 20 20 23 22 31C24 37 32 36 36 26Z" fill="#22C55E" stroke="#14532D" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M25 26L34 28" stroke="#14532D" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M84 24C92 17 101 21 98 29C96 35 88 34 84 24Z" fill="#22C55E" stroke="#14532D" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M95 24L86 26" stroke="#14532D" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M62 18C62 10 70 7 73 13C76 18 68 22 62 18Z" fill="#4ADE80" stroke="#14532D" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M34 36L38 24L45 31L51 20L59 29L66 19L73 30L81 23L86 36C89 48 88 64 83 74C78 82 70 85 60 85C50 85 42 82 37 74C32 64 31 48 34 36Z" fill="#8B5A2B" stroke="#4A2E14" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M38 27L41 42M51 23L52 38M66 22L65 39M80 26L77 43" stroke="#6B421D" stroke-width="2" stroke-linecap="round"/>
+            <path d="M40 70C42 75 46 79 52 81" stroke="#6B421D" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M80 68C78 73 75 77 70 80" stroke="#6B421D" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M86 54C92 52 96 55 94 59C92 62 88 60 86 54Z" fill="#4ADE80" stroke="#14532D" stroke-width="1.8"/>
+            <circle cx="47" cy="56" r="7.5" fill="#18120B"/>
+            <circle cx="44.8" cy="53.5" r="2.6" fill="#FFFFFF"/>
+            <circle cx="49.5" cy="58.5" r="1.2" fill="#FFFFFF"/>
+            <circle cx="73" cy="56" r="7.5" fill="#18120B"/>
+            <circle cx="70.8" cy="53.5" r="2.6" fill="#FFFFFF"/>
+            <circle cx="75.5" cy="58.5" r="1.2" fill="#FFFFFF"/>
+            <ellipse cx="41" cy="64" rx="3.5" ry="2" fill="#D97706" fill-opacity="0.45"/>
+            <ellipse cx="79" cy="64" rx="3.5" ry="2" fill="#D97706" fill-opacity="0.45"/>
+            <path d="M54 66C57 69.5 63 69.5 66 66" stroke="#3A220D" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M49 84L46 96H74L71 84" fill="#7A4D22" stroke="#4A2E14" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M56 85V95M64 85V95" stroke="#5C3816" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M46 90C38 87 33 82 31 76" stroke="#7A4D22" stroke="#4A2E14" stroke-width="4" stroke-linecap="round"/>
+            <path d="M30 75C25 73 24 67 29 67C33 67 34 72 30 75Z" fill="#22C55E" stroke="#14532D" stroke-width="1.6"/>
+            <path d="M41 95H79L75 110H45L41 95Z" fill="#D97706" stroke="#78350F" stroke-width="2.2" stroke-linejoin="round"/>
+            <rect x="38" y="92" width="44" height="5" rx="2.5" fill="#F59E0B" stroke="#78350F" stroke-width="2"/>
+          </svg>
         </div>
 
         <!-- Compact Plant Part Selector -->
@@ -183,7 +220,24 @@
     <div id="statusBanner" class="status-banner" role="alert" hidden></div>
 
     <!-- Step 2: Scannable Plant Identification Result & Care Guide -->
-    <section id="result" class="dossier-section" hidden>
+    <section id="result" class="dossier-section" tabindex="-1" hidden>
+      <div class="results-nav-strip">
+        <div class="results-nav-left">
+          <button id="backToIdentifyBtn" type="button" class="btn-secondary btn-sm">← Identify Another Plant</button>
+          <button id="resultUploadNewBtn" type="button" class="btn-secondary btn-sm">Upload New Photo</button>
+        </div>
+        <div class="results-organ-Quickbar">
+          <span class="control-hint">Part analyzed:</span>
+          <div class="segmented-bar" role="group" aria-label="Switch plant part in results">
+            <button type="button" class="seg-btn active" data-organ="auto">Auto</button>
+            <button type="button" class="seg-btn" data-organ="leaf">Leaf</button>
+            <button type="button" class="seg-btn" data-organ="flower">Flower</button>
+            <button type="button" class="seg-btn" data-organ="fruit">Fruit</button>
+            <button type="button" class="seg-btn" data-organ="bark">Bark</button>
+          </div>
+        </div>
+      </div>
+
       <div class="dossier-header">
         <div class="dossier-title-group">
           <p id="accessionMeta" class="editorial-kicker">Best Match</p>
@@ -250,6 +304,144 @@
           <div class="care-item">
             <span class="care-kicker">Propagation &amp; Climate</span>
             <p id="agriPropagation" class="care-value"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Geek Suite 1: Interactive Watering & Feeding Estimator -->
+      <div class="geek-estimator-block" id="geekEstimatorBlock">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Interactive Calculator</span>
+            <h3 class="panel-heading">Custom Watering &amp; Feeding Estimator</h3>
+          </div>
+          <span class="panel-sub">Select your pot size, material &amp; growing setup to calculate hydration</span>
+        </div>
+
+        <div class="estimator-controls-grid">
+          <div class="estimator-control-group">
+            <span class="estimator-control-label">1. Pot Diameter</span>
+            <div class="segmented-bar" role="group" aria-label="Select pot diameter">
+              <button type="button" class="seg-btn est-pot-size" data-pot-size="small">Small 4" (10cm)</button>
+              <button type="button" class="seg-btn est-pot-size active" data-pot-size="medium">Medium 6–8" (15–20cm)</button>
+              <button type="button" class="seg-btn est-pot-size" data-pot-size="large">Large 10"+ (25cm+)</button>
+            </div>
+          </div>
+
+          <div class="estimator-control-group">
+            <span class="estimator-control-label">2. Container Material</span>
+            <div class="segmented-bar" role="group" aria-label="Select pot material">
+              <button type="button" class="seg-btn est-pot-mat" data-pot-mat="terracotta">Terracotta / Clay</button>
+              <button type="button" class="seg-btn est-pot-mat active" data-pot-mat="plastic">Plastic / Ceramic</button>
+              <button type="button" class="seg-btn est-pot-mat" data-pot-mat="fabric">Grow Bag / Mesh</button>
+            </div>
+          </div>
+
+          <div class="estimator-control-group">
+            <span class="estimator-control-label">3. Microclimate</span>
+            <div class="segmented-bar" role="group" aria-label="Select microclimate">
+              <button type="button" class="seg-btn est-env active" data-est-env="indoor">Indoor Room</button>
+              <button type="button" class="seg-btn est-env" data-est-env="humid">Humid / Cabinet</button>
+              <button type="button" class="seg-btn est-env" data-est-env="outdoor">Sunny Patio / Bed</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="estimator-readout-grid">
+          <div class="estimator-metric-card">
+            <span class="estimator-metric-label">Est. Watering Cadence</span>
+            <strong id="estIntervalValue" class="estimator-metric-value">Every 7–9 days</strong>
+            <span id="estDryBackValue" class="estimator-metric-sub">Allow 50–65% top volume dry-back</span>
+          </div>
+          <div class="estimator-metric-card">
+            <span class="estimator-metric-label">Target Drench Volume</span>
+            <strong id="estVolumeValue" class="estimator-metric-value">360 mL (~1.5 cups)</strong>
+            <span id="estWaterQualityValue" class="estimator-metric-sub">Water until 10–15% runoff drains from bottom</span>
+          </div>
+          <div class="estimator-metric-card">
+            <span class="estimator-metric-label">NPK Ratio &amp; Feed Schedule</span>
+            <strong id="estNpkValue" class="estimator-metric-value">3-1-2 Foliage Formula</strong>
+            <span id="estDilutionValue" class="estimator-metric-sub">1/2 strength every 2nd watering in active growth</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Geek Suite 2: 12-Month Seasonal Care & Phenology Calendar -->
+      <div class="geek-calendar-block">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Annual Biological Cycle</span>
+            <h3 class="panel-heading">12-Month Seasonal Care &amp; Phenology Calendar</h3>
+          </div>
+          <span class="panel-sub">How to adjust water, fertilizer &amp; pruning across all 4 seasons</span>
+        </div>
+        <div id="seasonalCalendarGrid" class="seasonal-calendar-grid"></div>
+      </div>
+
+      <!-- Plant Geek Suite 3: Precision Grower Telemetry & Custom Substrate Mix -->
+      <div class="geek-telemetry-block">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Collector &amp; Botanist Metrics</span>
+            <h3 class="panel-heading">Precision Grower Telemetry &amp; Substrate Formula</h3>
+          </div>
+          <span class="panel-sub">PPFD photon flux, VPD vapor pressure deficit, hardiness &amp; soil recipe</span>
+        </div>
+
+        <div class="telemetry-metrics-grid">
+          <div class="telemetry-item">
+            <span class="care-kicker">Light (PPFD &amp; Lux)</span>
+            <strong id="telePpfd" class="telemetry-mono">150–350 μmol/m²/s</strong>
+            <span id="teleLux" class="telemetry-sub">3,000–10,000 Lux</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="care-kicker">Humidity &amp; VPD Target</span>
+            <strong id="teleHumidity" class="telemetry-mono">50–70% RH</strong>
+            <span id="teleVpd" class="telemetry-sub">VPD: 0.8–1.2 kPa</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="care-kicker">Temp &amp; USDA Hardiness</span>
+            <strong id="teleTemp" class="telemetry-mono">18–28°C (65–82°F)</strong>
+            <span id="teleUsda" class="telemetry-sub">USDA Zones 9–11</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="care-kicker">Target pH &amp; Growth Habit</span>
+            <strong id="telePh" class="telemetry-mono">pH 6.0–6.8</strong>
+            <span id="teleHabit" class="telemetry-sub">Perennial vascular plant</span>
+          </div>
+        </div>
+
+        <div class="substrate-recipe-box">
+          <div class="substrate-recipe-header">
+            <span class="substrate-recipe-title">Ideal Potting Substrate Formula (100% Mix Breakdown)</span>
+            <span id="teleBiome" class="substrate-biome-tag">Native Biome: Subtropical woodland</span>
+          </div>
+          <div id="substrateBar" class="substrate-stacked-bar" aria-label="Substrate percentage breakdown"></div>
+          <div id="substrateLegend" class="substrate-legend-row"></div>
+        </div>
+      </div>
+
+      <!-- Plant Geek Suite 4: Botanical Field Notes, Lookalike Differentiator & Research Links -->
+      <div class="geek-fieldnotes-block">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Morphology &amp; Taxonomy</span>
+            <h3 class="panel-heading">Botanical Field Notes &amp; Lookalike Guide</h3>
+          </div>
+          <div id="researchLinksBar" class="research-links-bar"></div>
+        </div>
+        <div class="fieldnotes-grid">
+          <div class="care-item">
+            <span class="care-kicker">Diagnostic Morphological Traits</span>
+            <p id="fnDiagnostic" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">How to Distinguish from Lookalikes</span>
+            <p id="fnLookalike" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">Taxonomic &amp; Ecological Notes</span>
+            <p id="fnEtymology" class="care-value"></p>
           </div>
         </div>
       </div>
