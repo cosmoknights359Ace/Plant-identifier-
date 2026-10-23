@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "outputDirectory": "web",
   "functions": {
     "api/server.js": {
       "includeFiles": "web/**"
@@ -7,7 +8,15 @@
   },
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/identify",
+      "destination": "/api/server.js"
+    },
+    {
+      "source": "/wiki-summary",
+      "destination": "/api/server.js"
+    },
+    {
+      "source": "/image-proxy",
       "destination": "/api/server.js"
     }
   ]

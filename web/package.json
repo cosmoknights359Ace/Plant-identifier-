@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node api/server.js",
     "start": "node api/server.js",
-    "build": "echo 'Static and serverless assets ready'"
+    "build": "mkdir -p public && cp index.html style.css script.js groot.svg public/"
   },
   "dependencies": {
     "axios": "^1.13.5",
