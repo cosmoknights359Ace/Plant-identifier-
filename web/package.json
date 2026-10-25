@@ -9,6 +9,7 @@
     "build": "mkdir -p public && cp index.html style.css script.js groot.svg icon.svg manifest.json sw.js pwa-192x192.png pwa-512x512.png pwa-maskable-512x512.png apple-touch-icon.png public/"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "axios": "^1.13.5",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

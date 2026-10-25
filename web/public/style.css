@@ -1,0 +1,2088 @@
+:root {
+  /* Classic Botanical Parchment & Forest Palette */
+  --bg-canvas: #F3EFE6;           /* Warm Botanical Parchment Canvas */
+  --bg-surface: #E9E4D8;          /* Warm Secondary Surface */
+  --bg-elevated: #FFFFFF;         /* Crisp White Workspace Cards */
+
+  /* High-Contrast Botanical Ink Hierarchy */
+  --ink-primary: #102419;
+  --ink-secondary: #34493C;
+  --ink-muted: #5C6F63;
+
+  /* Borders & Dividers */
+  --border-hairline: #D4DDD6;
+  --border-strong: #B2C4B7;
+
+  /* Forest, Emerald & Warm Amber Accents */
+  --header-forest: #0E2F1E;
+  --accent-forest: #15472E;
+  --accent-forest-hover: #0E3320;
+  --accent-emerald: #107C41;
+  --accent-sage: #EAF4EE;
+  --accent-amber: #D97706;
+  --accent-amber-hover: #B45309;
+  --accent-kicker: #C85A17;
+
+  /* Semantic Status Colors */
+  --danger-bg: #FEF2F2;
+  --danger-border: #FCA5A5;
+  --danger-ink: #991B1B;
+
+  /* Typography */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-canvas);
+  background-image: radial-gradient(#CEC7B6 1px, transparent 1px);
+  background-size: 18px 18px;
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed;
+  overflow-x: clip;
+}
+
+#identifier,
+#result,
+#specimens,
+#personalSpaceSection,
+#guideSection {
+  scroll-margin-top: 84px;
+}
+
+/* ==========================================================================
+   1. Strict 3-Zone Top Bar Contract (Deep Forest Green + Warm Amber Border)
+   ========================================================================== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 12px 36px;
+  background-color: var(--header-forest);
+  border-bottom: 2px solid var(--accent-amber);
+}
+
+.brand-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  text-decoration: none;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.brand-wordmark::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #10B981;
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.75);
+}
+
+.topnav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.86);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.nav-link:hover,
+.nav-link:focus-visible,
+.nav-link.active-nav {
+  color: #FFFFFF;
+  border-bottom-color: #10B981;
+}
+
+.nav-link-btn {
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  background-color: rgba(234, 179, 8, 0.14);
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  color: #FDE047;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.nav-link-btn:hover {
+  background-color: rgba(234, 179, 8, 0.24);
+  border-bottom-color: rgba(250, 204, 21, 0.65);
+  color: #FEF08A;
+}
+
+.topbar-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ==========================================================================
+   Buttons & Touch-Optimized Controls (Min 40px Desktop / 44px Mobile)
+   ========================================================================== */
+button,
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  min-height: 40px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), opacity 120ms ease, background-color 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+button:active:not(:disabled),
+.btn-primary:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  background-color: var(--accent-forest);
+  color: #FFFFFF;
+  border: 1px solid var(--accent-forest);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--accent-forest-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.topbar-upload-btn {
+  background-color: var(--accent-amber);
+  border-color: var(--accent-amber);
+  color: #FFFFFF;
+}
+
+.topbar-upload-btn:hover:not(:disabled) {
+  background-color: var(--accent-amber-hover);
+  border-color: var(--accent-amber-hover);
+}
+
+.topbar-tour-btn {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.topbar-tour-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.55);
+}
+
+.btn-secondary {
+  background-color: var(--bg-elevated);
+  color: var(--ink-primary);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--accent-sage);
+  border-color: var(--accent-forest);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--ink-secondary);
+  border: 1px solid transparent;
+  padding: 10px 14px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--ink-primary);
+  background-color: var(--accent-sage);
+}
+
+/* ==========================================================================
+   Main Site Container
+   ========================================================================== */
+.site-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 28px 72px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* ==========================================================================
+   2. Hero & Identification Workspace (Adaptive Desktop 2-Col / Mobile Stack)
+   ========================================================================== */
+.workspace-hero {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 32px;
+  align-items: stretch;
+  background-color: var(--bg-elevated);
+  border: 1px solid #C4D2C8;
+  border-top: 4px solid var(--accent-forest);
+  border-radius: 14px;
+  padding: 34px;
+  box-shadow: 0 4px 20px rgba(14, 47, 30, 0.05);
+}
+
+.hero-copy-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
+  padding-right: 28px;
+  border-right: 1.5px dashed #B5C6BA;
+}
+
+.hero-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hero-heading-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.groot-mascot-pic {
+  width: 80px;
+  height: 80px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: contain;
+  transition: transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.groot-mascot-pic:hover {
+  transform: scale(1.06) rotate(-4deg);
+}
+
+.editorial-kicker {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-kicker);
+}
+
+.hero-title {
+  margin: 0 0 10px 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.95rem, 3.1vw, 2.75rem);
+  font-weight: 600;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: var(--ink-primary);
+  text-wrap: balance;
+}
+
+.hero-lead {
+  margin: 0;
+  font-size: 15.5px;
+  line-height: 1.55;
+  color: var(--ink-secondary);
+  max-width: 54ch;
+}
+
+/* Mint-Sage Plant Part Control Block */
+.control-block {
+  padding: 14px 16px;
+  background-color: #F2F8F4;
+  border: 1px solid #CBE0D2;
+  border-left: 4px solid var(--accent-forest);
+  border-radius: 10px;
+}
+
+/* Warm Cream/Amber Sample Strip Block */
+.sample-strip-block {
+  padding: 14px 16px;
+  background-color: #FDF9F1;
+  border: 1px solid #F2DEC0;
+  border-left: 4px solid var(--accent-amber);
+  border-radius: 10px;
+}
+
+.control-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.control-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.control-hint {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.segmented-bar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  background-color: #E2EFE6;
+  border: 1px solid #B7D1C0;
+  border-radius: 8px;
+}
+
+.seg-btn {
+  min-height: 34px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ink-secondary);
+}
+
+.seg-btn:hover {
+  color: var(--ink-primary);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.seg-btn.active {
+  background-color: var(--accent-forest);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.sample-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sample-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-height: 56px;
+  background-color: #FFFFFF;
+  border: 1px solid #E5DEC9;
+  border-radius: 10px;
+  text-align: left;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.sample-card:hover,
+.sample-card.active-sample {
+  border-color: var(--accent-forest);
+  background-color: #F4FAF6;
+}
+
+.sample-illust {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: #E3F6EC;
+  color: #0F763E;
+  border: 1px solid #B6E6CC;
+}
+
+.sample-card[data-sample="hibiscus"] .sample-illust {
+  background-color: #FCE8EE;
+  color: #C92A62;
+  border-color: #F5C2D3;
+}
+
+.sample-card[data-sample="ficus"] .sample-illust {
+  background-color: #FEF3DC;
+  color: #C86D14;
+  border-color: #F7D99C;
+}
+
+.sample-card[data-sample="lavandula"] .sample-illust {
+  background-color: #EFE8FC;
+  color: #6D28D9;
+  border-color: #D8C5F7;
+}
+
+.sample-illust svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sample-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sample-common {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sample-sub {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Right Column: Clean Uploader Stage */
+.uploader-stage {
+  background-color: #FFFFFF;
+  border: 1px solid #C2D2C7;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.stage-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.stage-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.stage-meta {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #047857;
+  background-color: #DCFCE7;
+  border: 1px solid #86EFAC;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+#file,
+#cameraInput {
+  display: none;
+}
+
+.dropzone {
+  flex: 1;
+  min-height: 220px;
+  border: 2px dashed #1B5E3A;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  touch-action: manipulation;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  border-color: var(--accent-forest);
+  background-color: #F2F8F4;
+}
+
+.preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.empty-plate {
+  padding: 24px 20px;
+  text-align: center;
+  max-width: 340px;
+}
+
+.plate-icon {
+  width: 42px;
+  height: 42px;
+  color: var(--accent-emerald);
+  margin-bottom: 8px;
+}
+
+.empty-title {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.empty-sub {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+/* Paste Web Image URL Row */
+.url-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.url-input {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background-color: var(--bg-elevated);
+  color: var(--ink-primary);
+  min-width: 0;
+}
+
+.url-input:focus {
+  outline: 2px solid var(--accent-forest);
+  outline-offset: 1px;
+}
+
+/* Non-Blocking Inline Progress Indicator */
+.inline-loader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background-color: var(--accent-sage);
+  color: var(--accent-forest);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.inline-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(20, 69, 43, 0.25);
+  border-top-color: var(--accent-forest);
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.stage-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stage-secondary-btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Status Banner */
+.status-banner {
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-banner.error {
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger-ink);
+}
+
+.status-banner.info {
+  background-color: var(--accent-sage);
+  border: 1px solid var(--border-strong);
+  color: var(--accent-forest);
+}
+
+/* ==========================================================================
+   3. Plant Identification Result & Care Guide
+   ========================================================================== */
+.dossier-section {
+  background-color: var(--bg-elevated);
+  border: 1px solid #C4D2C8;
+  border-top: 4px solid var(--accent-forest);
+  border-radius: 14px;
+  padding: 28px 36px 36px;
+  box-shadow: 0 4px 20px rgba(14, 47, 30, 0.05);
+  outline: none;
+  transition: box-shadow 300ms ease, border-color 300ms ease;
+}
+
+.dossier-section.dossier-focus-flash {
+  box-shadow: 0 0 0 3px rgba(16, 124, 65, 0.28), 0 12px 32px rgba(14, 47, 30, 0.12);
+}
+
+.results-nav-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px dashed #B5C6BA;
+}
+
+.results-nav-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.results-organ-Quickbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-sm {
+  min-height: 36px;
+  padding: 7px 14px;
+  font-size: 13px;
+}
+
+.dossier-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.dossier-name {
+  margin: 0 0 4px 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--ink-primary);
+}
+
+.dossier-scientific {
+  margin: 0 0 8px 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  color: var(--ink-secondary);
+}
+
+.dossier-inline-meta {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.dossier-Right-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+  min-width: 230px;
+}
+
+.confidence-readout {
+  width: 100%;
+  text-align: right;
+}
+
+.confidence-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  margin-bottom: 2px;
+}
+
+.confidence-value {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent-forest);
+  font-variant-numeric: tabular-nums;
+}
+
+.confidence-bar {
+  height: 6px;
+  background-color: var(--bg-surface);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.confidence-fill {
+  height: 100%;
+  width: 0%;
+  background-color: var(--accent-emerald);
+  transition: width 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dossier-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Clean 4-Column Care Strip */
+.care-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.care-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+}
+
+.care-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-emerald);
+}
+
+.care-value {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink-primary);
+}
+
+/* Agricultural & Pest Management Guide (2x2 Scannable Grid) */
+.agri-guide-block {
+  padding: 20px 0 24px 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.agri-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.agri-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.agri-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-forest);
+  background-color: var(--accent-sage);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.agri-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.agri-item {
+  background-color: var(--bg-elevated);
+  border-left: 3px solid var(--accent-emerald);
+}
+
+/* ==========================================================================
+   3B. Plant Geek Suite: Estimator, Seasonal Calendar, Telemetry & Field Notes
+   ========================================================================== */
+.geek-estimator-block,
+.geek-calendar-block,
+.geek-telemetry-block,
+.geek-fieldnotes-block {
+  padding: 22px 0 24px 0;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.estimator-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.estimator-control-group {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.estimator-control-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+}
+
+.estimator-readout-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.estimator-metric-card {
+  background-color: #EDF6F0;
+  border: 1px solid #BCD8C6;
+  border-left: 4px solid var(--accent-forest);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.estimator-metric-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-emerald);
+}
+
+.estimator-metric-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.estimator-metric-sub {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+
+/* 12-Month Seasonal Care & Phenology Calendar */
+.seasonal-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.season-card {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-top: 3px solid var(--accent-forest);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.season-card.season-summer {
+  border-top-color: #D97706;
+  background-color: #FDF9F1;
+}
+
+.season-card.season-autumn {
+  border-top-color: #B45309;
+}
+
+.season-card.season-winter {
+  border-top-color: #3B6E5C;
+}
+
+.season-title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--border-hairline);
+}
+
+.season-name {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-forest);
+}
+
+.season-phase {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.season-detail-item {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+  margin: 0;
+}
+
+.season-detail-item strong {
+  color: var(--ink-primary);
+  font-weight: 600;
+}
+
+/* Precision Grower Telemetry & Substrate Formula */
+.telemetry-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.telemetry-item {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.telemetry-mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15.5px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.telemetry-sub {
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
+
+.substrate-recipe-box {
+  background-color: #FAF6EE;
+  border: 1px solid #DFD5C0;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.substrate-recipe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.substrate-recipe-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-primary);
+}
+
+.substrate-biome-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-forest);
+}
+
+.substrate-stacked-bar {
+  display: flex;
+  height: 14px;
+  width: 100%;
+  border-radius: 7px;
+  overflow: hidden;
+  background-color: #E2DDD2;
+  margin-bottom: 10px;
+}
+
+.substrate-seg {
+  height: 100%;
+  transition: width 250ms ease;
+}
+
+.substrate-seg-0 { background-color: #15472E; }
+.substrate-seg-1 { background-color: #107C41; }
+.substrate-seg-2 { background-color: #D97706; }
+.substrate-seg-3 { background-color: #6B8E78; }
+
+.substrate-legend-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.substrate-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-secondary);
+}
+
+.substrate-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.substrate-pct {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+/* Botanical Field Notes & Research Links */
+.fieldnotes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.research-links-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.research-ext-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 11px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-forest);
+  background-color: #E6F0EA;
+  border: 1px solid #BCD4C5;
+  text-decoration: none;
+  transition: background-color 150ms ease;
+}
+
+.research-ext-link:hover {
+  background-color: #D3E6DA;
+}
+
+/* Dossier 2-Column Content Grid */
+.dossier-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 36px;
+  margin-top: 24px;
+}
+
+.dossier-left-col {
+  padding-right: 24px;
+  border-right: 1px solid var(--border-hairline);
+}
+
+.specimen-figure {
+  margin: 0 0 20px 0;
+}
+
+.result-media {
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-media img {
+  width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+  display: block;
+}
+
+.figure-caption {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+.panel-heading {
+  margin: 0 0 12px 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.taxonomy-panel {
+  padding-top: 16px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.taxonomy-dl {
+  margin: 0 0 16px 0;
+  display: grid;
+  grid-template-columns: 105px 1fr;
+  row-gap: 8px;
+  column-gap: 12px;
+  font-size: 13.5px;
+}
+
+.taxonomy-dl dt {
+  color: var(--ink-muted);
+}
+
+.taxonomy-dl dd {
+  margin: 0;
+  color: var(--ink-primary);
+  font-weight: 500;
+}
+
+.vernacular-block {
+  padding-top: 14px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.vernacular-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  margin-bottom: 4px;
+}
+
+.vernacular-list {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+  line-height: 1.5;
+}
+
+/* Overview, Photos & Candidate Table */
+.monograph-block,
+.reference-gallery-block {
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.description-prose {
+  max-width: 68ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink-secondary);
+}
+
+.description-prose p {
+  margin: 0 0 12px 0;
+}
+
+.wiki-link {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-forest);
+  text-decoration: underline;
+}
+
+.panel-header-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.panel-header-row .panel-heading {
+  margin: 0;
+}
+
+.panel-sub {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+.gallery-item {
+  aspect-ratio: 4 / 3;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-hairline);
+  background-color: var(--bg-canvas);
+  cursor: zoom-in;
+  position: relative;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 12px;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.candidates-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+
+.candidates-table th {
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  border-bottom: 1px solid var(--border-strong);
+  white-space: nowrap;
+}
+
+.candidates-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border-hairline);
+  color: var(--ink-primary);
+}
+
+.candidates-table tbody tr {
+  cursor: pointer;
+}
+
+.candidates-table tbody tr:hover {
+  background-color: var(--bg-canvas);
+}
+
+.candidates-table tbody tr.active-row {
+  background-color: var(--accent-sage);
+  font-weight: 600;
+}
+
+.num-col {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.sci-cell {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--ink-secondary);
+}
+
+/* ==========================================================================
+   4. My Garden (Personal Space Section — Offscreen Paint Containment for 6GB RAM)
+   ========================================================================== */
+.personal-space-section {
+  background-color: var(--bg-elevated);
+  border: 1px solid #C4D2C8;
+  border-top: 4px solid var(--accent-forest);
+  border-radius: 14px;
+  padding: 36px;
+  box-shadow: 0 4px 20px rgba(14, 47, 30, 0.05);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 420px;
+}
+
+.section-header-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border-hairline);
+  flex-wrap: wrap;
+}
+
+.section-heading {
+  margin: 0 0 4px 0;
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.section-sub {
+  margin: 0;
+  font-size: 14.5px;
+  color: var(--ink-secondary);
+}
+
+.folder-sync-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.collection-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.collection-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.vault-inline-count {
+  font-size: 13px;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.search-input {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  padding: 9px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  min-width: 0;
+}
+
+.search-input:focus {
+  outline: 2px solid var(--accent-forest);
+  background-color: var(--bg-elevated);
+}
+
+/* Collapsible Garden Preferences Drawer */
+.preferences-drawer {
+  margin-bottom: 20px;
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  background-color: var(--bg-canvas);
+}
+
+.preferences-summary {
+  padding: 12px 16px;
+  min-height: 44px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  user-select: none;
+}
+
+.preferences-summary:hover {
+  color: var(--ink-primary);
+}
+
+.drawer-status-meta {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ink-muted);
+}
+
+.preferences-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 16px;
+  border-top: 1px solid var(--border-hairline);
+  background-color: var(--bg-elevated);
+  border-radius: 0 0 10px 10px;
+}
+
+.pref-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pref-inputs-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.autosave-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.interests-bar {
+  width: 100%;
+}
+
+/* Saved Plant Cards Grid (Memory-contained cards) */
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.collection-card {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 360px;
+}
+
+.collection-card-media {
+  aspect-ratio: 16 / 10;
+  background-color: var(--bg-canvas);
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.collection-card-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.collection-card-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.collection-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.fav-btn {
+  min-height: 32px;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  background-color: var(--bg-surface);
+  color: var(--ink-secondary);
+  border: 1px solid var(--border-hairline);
+}
+
+.fav-btn.is-fav {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border-color: #FCD34D;
+}
+
+.collection-card-sci {
+  margin: 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--ink-secondary);
+}
+
+.collection-card-meta {
+  margin: 2px 0 6px 0;
+  font-size: 12px;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.note-textarea {
+  width: 100%;
+  min-height: 56px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 8px 10px;
+  border: 1px solid var(--border-hairline);
+  border-radius: 8px;
+  background-color: var(--bg-canvas);
+  color: var(--ink-primary);
+  resize: vertical;
+  margin-bottom: 8px;
+}
+
+.note-textarea:focus {
+  outline: 2px solid var(--accent-forest);
+  background-color: var(--bg-elevated);
+}
+
+.collection-card-actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.empty-collection-msg {
+  grid-column: 1 / -1;
+  padding: 28px;
+  text-align: center;
+  background-color: var(--bg-canvas);
+  border: 1px dashed var(--border-strong);
+  border-radius: 10px;
+  color: var(--ink-secondary);
+  font-size: 14px;
+}
+
+/* ==========================================================================
+   5. Simple 3-Step "How It Works" Section
+   ========================================================================== */
+.guide-section {
+  background-color: var(--bg-elevated);
+  border: 1px solid #C4D2C8;
+  border-top: 4px solid var(--accent-forest);
+  border-radius: 14px;
+  padding: 36px;
+  box-shadow: 0 4px 20px rgba(14, 47, 30, 0.05);
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 260px;
+}
+
+.guide-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.guide-item {
+  padding: 18px;
+  background-color: var(--bg-canvas);
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+}
+
+.guide-title {
+  margin: 0 0 6px 0;
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.guide-body {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-secondary);
+}
+
+/* ==========================================================================
+   6. Simple Welcome Tip Screen Modal (Lightweight Overlay)
+   ========================================================================== */
+.tip-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background-color: rgba(17, 28, 21, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.tip-modal-card {
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tip-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 22px 14px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.tip-modal-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.tip-modal-body {
+  padding: 18px 22px;
+  overflow-y: auto;
+}
+
+.simple-tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.simple-tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.simple-tip-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: var(--accent-sage);
+  color: var(--accent-forest);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.simple-tip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.simple-tip-text strong {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink-primary);
+}
+
+.simple-tip-text p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+
+.tip-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  background-color: var(--bg-canvas);
+  border-top: 1px solid var(--border-hairline);
+}
+
+/* ==========================================================================
+   7. Mobile Bottom Tab Bar (Hidden on Desktop, Thumb-Zone on Mobile)
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* ==========================================================================
+   8. Minimal Footer
+   ========================================================================== */
+.site-foot {
+  border-top: 1px solid var(--border-hairline);
+  padding: 24px 40px;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.foot-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   9. Responsive Breakpoints (Tablet & Mobile Touch Optimization)
+   ========================================================================== */
+@media (max-width: 1024px) {
+  .workspace-hero,
+  .preferences-panel {
+    grid-template-columns: 1fr;
+  }
+  .hero-copy-col {
+    padding-right: 0;
+    border-right: none;
+    padding-bottom: 20px;
+    border-bottom: 1.5px dashed #B5C6BA;
+  }
+  .dossier-left-col {
+    padding-right: 0;
+    border-right: none;
+  }
+  .care-strip,
+  .seasonal-calendar-grid,
+  .telemetry-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .estimator-controls-grid,
+  .estimator-readout-grid,
+  .fieldnotes-grid {
+    grid-template-columns: 1fr;
+  }
+  .dossier-grid {
+    grid-template-columns: 1fr;
+  }
+  .guide-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Compact Top Bar on Mobile */
+  .topbar {
+    padding: 8px 16px;
+    min-height: 48px;
+    gap: 12px;
+  }
+  .topnav,
+  #topTipsBtn {
+    display: none;
+  }
+  .topbar-action .btn-primary,
+  #installAppBtn {
+    min-height: 36px;
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+
+  /* Leave room at bottom for Fixed Thumb-Zone Navigation Bar */
+  .site-container {
+    padding: 16px 12px calc(76px + env(safe-area-inset-bottom, 0px));
+    gap: 20px;
+  }
+
+  .site-foot {
+    padding: 20px 16px calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .workspace-hero,
+  .dossier-section,
+  .personal-space-section,
+  .guide-section {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  /* Put Groot & Headline at top, Uploader Stage immediately below for quick mobile access */
+  .groot-mascot-pic {
+    width: 64px;
+    height: 64px;
+  }
+
+  .dropzone {
+    min-height: 175px;
+  }
+
+  /* 44px minimum touch targets & 16px font on inputs so mobile browsers never auto-zoom */
+  button,
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost {
+    min-height: 44px;
+  }
+
+  .url-input,
+  .search-input,
+  .note-textarea {
+    font-size: 16px;
+    min-height: 44px;
+  }
+
+  .stage-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .stage-secondary-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    width: 100%;
+  }
+
+  #identify {
+    width: 100%;
+  }
+
+  .care-strip,
+  .telemetry-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .agri-grid,
+  .seasonal-calendar-grid,
+  .estimator-controls-grid,
+  .estimator-readout-grid,
+  .fieldnotes-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .pref-inputs-row {
+    grid-template-columns: 1fr;
+  }
+
+  .desktop-only-btn {
+    display: none;
+  }
+
+  .dossier-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .dossier-Right-group {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .confidence-readout {
+    text-align: left;
+  }
+
+  .dossier-actions {
+    width: 100%;
+  }
+
+  .dossier-actions .btn-primary,
+  .dossier-actions .btn-secondary {
+    flex: 1;
+  }
+
+  .tip-modal-footer {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  /* Fixed Bottom Thumb-Zone Navigation Bar */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    align-items: center;
+    height: calc(56px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background-color: #FFFFFF;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 56px;
+    min-height: 44px;
+    padding: 4px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .mobile-nav-item svg {
+    width: 20px;
+    height: 20px;
+    color: var(--accent-forest);
+  }
+
+  .mobile-nav-item:active {
+    background-color: var(--accent-sage);
+  }
+}
+
+@media (max-width: 420px) {
+  .sample-grid,
+  .care-strip {
+    grid-template-columns: 1fr;
+  }
+}
