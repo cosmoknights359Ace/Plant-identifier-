@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0E2F1E" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="VxPlants" />
+  <title>VxPlants — Instant Plant ID &amp; Care Guide</title>
+  <meta name="description" content="Identify houseplants, flowers, and trees in seconds on mobile or desktop. Get simple care instructions and keep your own personal plant journal." />
+  <meta property="og:title" content="VxPlants — Instant Plant ID &amp; Care Guide" />
+  <meta property="og:description" content="Identify houseplants, flowers, and trees in seconds on mobile or desktop. Get simple care instructions and keep your own personal plant journal." />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+  <!-- Strict 3-Zone Top Bar Contract -->
+  <header class="topbar">
+    <a href="#identifier" class="brand-wordmark">VxPlants</a>
+
+    <nav class="topnav" aria-label="Primary Navigation">
+      <a href="#identifier" class="nav-link active-nav" data-nav="#identifier">Identify</a>
+      <a href="#result" id="navResultLink" class="nav-link" data-nav="#result" hidden>Plant Results</a>
+      <a href="#specimens" class="nav-link" data-nav="#specimens">Sample Plants</a>
+      <a href="#personalSpaceSection" class="nav-link" data-nav="#personalSpaceSection">My Garden</a>
+      <a href="#guideSection" class="nav-link" data-nav="#guideSection">How It Works</a>
+      <button id="navTipsBtn" type="button" class="nav-link nav-link-btn">Feature Guide &amp; Tips</button>
+    </nav>
+
+    <div class="topbar-action">
+      <button id="installAppBtn" type="button" class="btn-secondary topbar-tour-btn" hidden>Install App</button>
+      <button id="topTipsBtn" type="button" class="btn-secondary topbar-tour-btn">Quick Tour</button>
+      <button id="topUploadBtn" type="button" class="btn-primary topbar-upload-btn">Upload Photo</button>
+    </div>
+  </header>
+
+  <main class="site-container">
+    <!-- Step 1: Adaptive Desktop + Mobile Identification Workspace -->
+    <section id="identifier" class="workspace-hero">
+      <div class="hero-copy-col">
+        <div class="hero-heading-row">
+          <div class="hero-heading-text">
+            <p class="editorial-kicker">Instant Plant Identifier</p>
+            <h1 class="hero-title">Identify any plant in seconds.</h1>
+            <p class="hero-lead">
+              Snap a photo with your phone, drop an image from your computer, or tap a sample plant below for instant care tips.
+            </p>
+          </div>
+          <svg
+            class="groot-mascot-pic"
+            viewBox="0 0 120 120"
+            width="80"
+            height="80"
+            role="img"
+            aria-label="Baby Groot plant mascot"
+            fill="none"
+          >
+            <title>I am Groot!</title>
+            <circle cx="60" cy="60" r="56" fill="#E6F0EA" stroke="#15472E" stroke-width="2.5"/>
+            <circle cx="60" cy="60" r="48" fill="#F6F7F5"/>
+            <path d="M36 26C28 20 20 23 22 31C24 37 32 36 36 26Z" fill="#22C55E" stroke="#14532D" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M25 26L34 28" stroke="#14532D" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M84 24C92 17 101 21 98 29C96 35 88 34 84 24Z" fill="#22C55E" stroke="#14532D" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M95 24L86 26" stroke="#14532D" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M62 18C62 10 70 7 73 13C76 18 68 22 62 18Z" fill="#4ADE80" stroke="#14532D" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M34 36L38 24L45 31L51 20L59 29L66 19L73 30L81 23L86 36C89 48 88 64 83 74C78 82 70 85 60 85C50 85 42 82 37 74C32 64 31 48 34 36Z" fill="#8B5A2B" stroke="#4A2E14" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M38 27L41 42M51 23L52 38M66 22L65 39M80 26L77 43" stroke="#6B421D" stroke-width="2" stroke-linecap="round"/>
+            <path d="M40 70C42 75 46 79 52 81" stroke="#6B421D" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M80 68C78 73 75 77 70 80" stroke="#6B421D" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M86 54C92 52 96 55 94 59C92 62 88 60 86 54Z" fill="#4ADE80" stroke="#14532D" stroke-width="1.8"/>
+            <circle cx="47" cy="56" r="7.5" fill="#18120B"/>
+            <circle cx="44.8" cy="53.5" r="2.6" fill="#FFFFFF"/>
+            <circle cx="49.5" cy="58.5" r="1.2" fill="#FFFFFF"/>
+            <circle cx="73" cy="56" r="7.5" fill="#18120B"/>
+            <circle cx="70.8" cy="53.5" r="2.6" fill="#FFFFFF"/>
+            <circle cx="75.5" cy="58.5" r="1.2" fill="#FFFFFF"/>
+            <ellipse cx="41" cy="64" rx="3.5" ry="2" fill="#D97706" fill-opacity="0.45"/>
+            <ellipse cx="79" cy="64" rx="3.5" ry="2" fill="#D97706" fill-opacity="0.45"/>
+            <path d="M54 66C57 69.5 63 69.5 66 66" stroke="#3A220D" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M49 84L46 96H74L71 84" fill="#7A4D22" stroke="#4A2E14" stroke-width="2.2" stroke-linejoin="round"/>
+            <path d="M56 85V95M64 85V95" stroke="#5C3816" stroke-width="1.6" stroke-linecap="round"/>
+            <path d="M46 90C38 87 33 82 31 76" stroke="#7A4D22" stroke="#4A2E14" stroke-width="4" stroke-linecap="round"/>
+            <path d="M30 75C25 73 24 67 29 67C33 67 34 72 30 75Z" fill="#22C55E" stroke="#14532D" stroke-width="1.6"/>
+            <path d="M41 95H79L75 110H45L41 95Z" fill="#D97706" stroke="#78350F" stroke-width="2.2" stroke-linejoin="round"/>
+            <rect x="38" y="92" width="44" height="5" rx="2.5" fill="#F59E0B" stroke="#78350F" stroke-width="2"/>
+          </svg>
+        </div>
+
+        <!-- Compact Plant Part Selector -->
+        <div class="control-block">
+          <div class="control-header">
+            <span class="control-label">What part of the plant is shown?</span>
+            <span class="control-hint">Switching parts automatically updates results</span>
+          </div>
+          <div class="segmented-bar" role="group" aria-label="Select plant part">
+            <button type="button" class="seg-btn active" data-organ="auto">Auto-detect</button>
+            <button type="button" class="seg-btn" data-organ="leaf">Leaf</button>
+            <button type="button" class="seg-btn" data-organ="flower">Flower</button>
+            <button type="button" class="seg-btn" data-organ="fruit">Fruit</button>
+            <button type="button" class="seg-btn" data-organ="bark">Bark</button>
+          </div>
+        </div>
+
+        <!-- Sample Plants for One-Click / One-Tap Testing -->
+        <div id="specimens" class="sample-strip-block">
+          <div class="control-header">
+            <span class="control-label">Don't have a photo handy? Try a sample plant:</span>
+            <span class="control-hint">One-tap live demo</span>
+          </div>
+          <div class="sample-grid">
+            <button type="button" class="sample-card" data-sample="monstera">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M24 6C13 10 8 22 12 34C15 40 21 42 24 42C27 42 33 40 36 34C40 22 35 10 24 6Z" stroke="currentColor" stroke-width="1.75"/>
+                  <path d="M24 6V42M24 18L15 14M24 25L13 22M24 32L16 30M24 18L33 14M24 25L35 22M24 32L32 30" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">Swiss Cheese Plant</span>
+                <span class="sample-sub">Monstera deliciosa · Leaf</span>
+              </div>
+            </button>
+
+            <button type="button" class="sample-card" data-sample="hibiscus">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <circle cx="24" cy="24" r="5" stroke="currentColor" stroke-width="1.75"/>
+                  <path d="M24 7C28 7 31 12 28 19C35 16 41 19 41 24C41 29 35 32 28 29C31 36 28 41 24 41C20 41 17 36 20 29C13 32 7 29 7 24C7 19 13 16 20 19C17 12 20 7 24 7Z" stroke="currentColor" stroke-width="1.75"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">China Rose Hibiscus</span>
+                <span class="sample-sub">Hibiscus rosa-sinensis · Flower</span>
+              </div>
+            </button>
+
+            <button type="button" class="sample-card" data-sample="ficus">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M24 5C15 12 13 25 18 36C20 40 24 43 24 43C24 43 28 40 30 36C35 25 33 12 24 5Z" stroke="currentColor" stroke-width="1.75"/>
+                  <path d="M24 5V43M24 16L18 12M24 24L17 20M24 32L19 29M24 16L30 12M24 24L31 20M24 32L29 29" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">Rubber Plant</span>
+                <span class="sample-sub">Ficus elastica · Leaf</span>
+              </div>
+            </button>
+
+            <button type="button" class="sample-card" data-sample="lavandula">
+              <div class="sample-illust">
+                <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                  <path d="M24 8V42M20 14C20 11 24 11 24 14C24 11 28 11 28 14M19 21C19 18 24 18 24 21C24 18 29 18 29 21M19 28C19 25 24 25 24 28C24 25 29 25 29 28" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="sample-meta">
+                <span class="sample-common">English Lavender</span>
+                <span class="sample-sub">Lavandula angustifolia · Flower</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Mobile Camera + Gallery + Desktop Drag-and-Drop Stage -->
+      <div class="uploader-stage">
+        <div class="stage-topbar">
+          <span class="stage-title">Add Your Plant Photo</span>
+          <span id="sanitizedBadge" class="stage-meta">Private · Location stripped</span>
+        </div>
+
+        <!-- Standard File/Gallery Picker + Dedicated Mobile Rear Camera Input -->
+        <input id="file" type="file" accept="image/jpeg,image/png,image/webp,image/*" />
+        <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
+
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Tap to choose a plant photo or drop an image here">
+          <div id="preview" class="preview empty">
+            <div class="empty-plate">
+              <svg class="plate-icon" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+                <path d="M32 10C20 16 14 30 18 44C21 51 28 54 32 54C36 54 43 51 46 44C50 30 44 16 32 10Z" stroke="currentColor" stroke-width="1.75"/>
+                <path d="M32 10V54M32 24L22 19M32 34L20 29M32 43L23 39M32 24L42 19M32 34L44 29M32 43L41 39" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <p class="empty-title">Tap to upload a photo, or drag &amp; drop here</p>
+              <p class="empty-sub">Works with phone camera, photo gallery, or Ctrl+V paste</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline Non-Blocking Progress Bar -->
+        <div id="inlineLoader" class="inline-loader" hidden>
+          <div class="inline-spinner"></div>
+          <span id="inlineLoaderText">Identifying plant…</span>
+        </div>
+
+        <div class="stage-actions">
+          <div class="stage-secondary-btns">
+            <button id="takePhotoBtn" type="button" class="btn-secondary">Take Photo</button>
+            <label for="file" class="btn-secondary">Photo Library</label>
+            <button id="dbgReset" type="button" class="btn-ghost">Clear</button>
+          </div>
+          <button id="identify" type="button" class="btn-primary" disabled>Identify Plant</button>
+        </div>
+
+        <!-- Direct Web Image URL Input -->
+        <form id="urlForm" class="url-input-row">
+          <input id="imageUrlInput" type="url" class="url-input" placeholder="Or paste an image link (https://…)" aria-label="Paste an image URL from the web" />
+          <button id="urlSubmitBtn" type="submit" class="btn-secondary">Use Link</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Accessible Status & Error Banner -->
+    <div id="statusBanner" class="status-banner" role="alert" hidden></div>
+
+    <!-- Step 2: Scannable Plant Identification Result & Care Guide -->
+    <section id="result" class="dossier-section" tabindex="-1" hidden>
+      <div class="results-nav-strip">
+        <div class="results-nav-left">
+          <button id="backToIdentifyBtn" type="button" class="btn-secondary btn-sm">← Identify Another Plant</button>
+          <button id="resultUploadNewBtn" type="button" class="btn-secondary btn-sm">Upload New Photo</button>
+        </div>
+        <div class="results-organ-Quickbar">
+          <span class="control-hint">Part analyzed:</span>
+          <div class="segmented-bar" role="group" aria-label="Switch plant part in results">
+            <button type="button" class="seg-btn active" data-organ="auto">Auto</button>
+            <button type="button" class="seg-btn" data-organ="leaf">Leaf</button>
+            <button type="button" class="seg-btn" data-organ="flower">Flower</button>
+            <button type="button" class="seg-btn" data-organ="fruit">Fruit</button>
+            <button type="button" class="seg-btn" data-organ="bark">Bark</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="dossier-header">
+        <div class="dossier-title-group">
+          <p id="accessionMeta" class="editorial-kicker">Best Match</p>
+          <h2 id="name" class="dossier-name"></h2>
+          <p id="scientific" class="dossier-scientific"></p>
+          <p id="taxonomy" class="dossier-inline-meta"></p>
+        </div>
+
+        <div class="dossier-Right-group">
+          <div class="confidence-readout">
+            <span class="confidence-label">Match Score</span>
+            <div class="confidence-number-row">
+              <span id="confidence" class="confidence-value">0.0%</span>
+            </div>
+            <div class="confidence-bar"><div id="confidenceBar" class="confidence-fill"></div></div>
+          </div>
+
+          <div class="dossier-actions">
+            <button id="saveSpecimenBtn" type="button" class="btn-primary">Save to My Garden</button>
+            <button id="copyCitationBtn" type="button" class="btn-secondary">Share / Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Practical Care & Safety Strip (Full-Width 4-Column on Desktop, 2x2 on Mobile) -->
+      <div class="care-strip">
+        <div class="care-item">
+          <span class="care-kicker">Sunlight</span>
+          <p id="careSunlight" class="care-value"></p>
+        </div>
+        <div class="care-item">
+          <span class="care-kicker">Watering</span>
+          <p id="careWatering" class="care-value"></p>
+        </div>
+        <div class="care-item">
+          <span class="care-kicker">Pet Safety</span>
+          <p id="careToxicity" class="care-value"></p>
+        </div>
+        <div class="care-item">
+          <span class="care-kicker">Best Spot &amp; Tip</span>
+          <p id="careEnvironment" class="care-value"></p>
+        </div>
+      </div>
+
+      <!-- Agriculturist & Grower Guide: Pests, Prevention, Soil/NPK & Propagation -->
+      <div class="agri-guide-block">
+        <div class="panel-header-row">
+          <h3 class="panel-heading">Plant Health, Pests &amp; Grower Guide</h3>
+          <span class="panel-sub">Pest defense, soil pH, nutrients &amp; propagation</span>
+        </div>
+        <div class="agri-grid">
+          <div class="care-item">
+            <span class="care-kicker">Common Pests &amp; Symptoms</span>
+            <p id="agriPests" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">Prevention &amp; Organic Treatment</span>
+            <p id="agriPrevention" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">Soil, pH &amp; Fertilizer (NPK)</span>
+            <p id="agriSoil" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">Propagation &amp; Climate</span>
+            <p id="agriPropagation" class="care-value"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Geek Suite 1: Interactive Watering & Feeding Estimator -->
+      <div class="geek-estimator-block" id="geekEstimatorBlock">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Interactive Calculator</span>
+            <h3 class="panel-heading">Custom Watering &amp; Feeding Estimator</h3>
+          </div>
+          <span class="panel-sub">Select your pot size, material &amp; growing setup to calculate hydration</span>
+        </div>
+
+        <div class="estimator-controls-grid">
+          <div class="estimator-control-group">
+            <span class="estimator-control-label">1. Pot Diameter</span>
+            <div class="segmented-bar" role="group" aria-label="Select pot diameter">
+              <button type="button" class="seg-btn est-pot-size" data-pot-size="small">Small 4" (10cm)</button>
+              <button type="button" class="seg-btn est-pot-size active" data-pot-size="medium">Medium 6–8" (15–20cm)</button>
+              <button type="button" class="seg-btn est-pot-size" data-pot-size="large">Large 10"+ (25cm+)</button>
+            </div>
+          </div>
+
+          <div class="estimator-control-group">
+            <span class="estimator-control-label">2. Container Material</span>
+            <div class="segmented-bar" role="group" aria-label="Select pot material">
+              <button type="button" class="seg-btn est-pot-mat" data-pot-mat="terracotta">Terracotta / Clay</button>
+              <button type="button" class="seg-btn est-pot-mat active" data-pot-mat="plastic">Plastic / Ceramic</button>
+              <button type="button" class="seg-btn est-pot-mat" data-pot-mat="fabric">Grow Bag / Mesh</button>
+            </div>
+          </div>
+
+          <div class="estimator-control-group">
+            <span class="estimator-control-label">3. Microclimate</span>
+            <div class="segmented-bar" role="group" aria-label="Select microclimate">
+              <button type="button" class="seg-btn est-env active" data-est-env="indoor">Indoor Room</button>
+              <button type="button" class="seg-btn est-env" data-est-env="humid">Humid / Cabinet</button>
+              <button type="button" class="seg-btn est-env" data-est-env="outdoor">Sunny Patio / Bed</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="estimator-readout-grid">
+          <div class="estimator-metric-card">
+            <span class="estimator-metric-label">Est. Watering Cadence</span>
+            <strong id="estIntervalValue" class="estimator-metric-value">Every 7–9 days</strong>
+            <span id="estDryBackValue" class="estimator-metric-sub">Allow 50–65% top volume dry-back</span>
+          </div>
+          <div class="estimator-metric-card">
+            <span class="estimator-metric-label">Target Drench Volume</span>
+            <strong id="estVolumeValue" class="estimator-metric-value">360 mL (~1.5 cups)</strong>
+            <span id="estWaterQualityValue" class="estimator-metric-sub">Water until 10–15% runoff drains from bottom</span>
+          </div>
+          <div class="estimator-metric-card">
+            <span class="estimator-metric-label">NPK Ratio &amp; Feed Schedule</span>
+            <strong id="estNpkValue" class="estimator-metric-value">3-1-2 Foliage Formula</strong>
+            <span id="estDilutionValue" class="estimator-metric-sub">1/2 strength every 2nd watering in active growth</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Geek Suite 2: 12-Month Seasonal Care & Phenology Calendar -->
+      <div class="geek-calendar-block">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Annual Biological Cycle</span>
+            <h3 class="panel-heading">12-Month Seasonal Care &amp; Phenology Calendar</h3>
+          </div>
+          <span class="panel-sub">How to adjust water, fertilizer &amp; pruning across all 4 seasons</span>
+        </div>
+        <div id="seasonalCalendarGrid" class="seasonal-calendar-grid"></div>
+      </div>
+
+      <!-- Plant Geek Suite 3: Precision Grower Telemetry & Custom Substrate Mix -->
+      <div class="geek-telemetry-block">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Collector &amp; Botanist Metrics</span>
+            <h3 class="panel-heading">Precision Grower Telemetry &amp; Substrate Formula</h3>
+          </div>
+          <span class="panel-sub">PPFD photon flux, VPD vapor pressure deficit, hardiness &amp; soil recipe</span>
+        </div>
+
+        <div class="telemetry-metrics-grid">
+          <div class="telemetry-item">
+            <span class="care-kicker">Light (PPFD &amp; Lux)</span>
+            <strong id="telePpfd" class="telemetry-mono">150–350 μmol/m²/s</strong>
+            <span id="teleLux" class="telemetry-sub">3,000–10,000 Lux</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="care-kicker">Humidity &amp; VPD Target</span>
+            <strong id="teleHumidity" class="telemetry-mono">50–70% RH</strong>
+            <span id="teleVpd" class="telemetry-sub">VPD: 0.8–1.2 kPa</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="care-kicker">Temp &amp; USDA Hardiness</span>
+            <strong id="teleTemp" class="telemetry-mono">18–28°C (65–82°F)</strong>
+            <span id="teleUsda" class="telemetry-sub">USDA Zones 9–11</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="care-kicker">Target pH &amp; Growth Habit</span>
+            <strong id="telePh" class="telemetry-mono">pH 6.0–6.8</strong>
+            <span id="teleHabit" class="telemetry-sub">Perennial vascular plant</span>
+          </div>
+        </div>
+
+        <div class="substrate-recipe-box">
+          <div class="substrate-recipe-header">
+            <span class="substrate-recipe-title">Ideal Potting Substrate Formula (100% Mix Breakdown)</span>
+            <span id="teleBiome" class="substrate-biome-tag">Native Biome: Subtropical woodland</span>
+          </div>
+          <div id="substrateBar" class="substrate-stacked-bar" aria-label="Substrate percentage breakdown"></div>
+          <div id="substrateLegend" class="substrate-legend-row"></div>
+        </div>
+      </div>
+
+      <!-- Plant Geek Suite 4: Botanical Field Notes, Lookalike Differentiator & Research Links -->
+      <div class="geek-fieldnotes-block">
+        <div class="panel-header-row">
+          <div>
+            <span class="editorial-kicker">Morphology &amp; Taxonomy</span>
+            <h3 class="panel-heading">Botanical Field Notes &amp; Lookalike Guide</h3>
+          </div>
+          <div id="researchLinksBar" class="research-links-bar"></div>
+        </div>
+        <div class="fieldnotes-grid">
+          <div class="care-item">
+            <span class="care-kicker">Diagnostic Morphological Traits</span>
+            <p id="fnDiagnostic" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">How to Distinguish from Lookalikes</span>
+            <p id="fnLookalike" class="care-value"></p>
+          </div>
+          <div class="care-item">
+            <span class="care-kicker">Taxonomic &amp; Ecological Notes</span>
+            <p id="fnEtymology" class="care-value"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="dossier-grid">
+        <!-- Left Column: Photo + Quick Facts -->
+        <div class="dossier-left-col">
+          <figure class="specimen-figure">
+            <div class="result-media" id="mediaArea"></div>
+            <figcaption id="figureCaption" class="figure-caption"></figcaption>
+          </figure>
+
+          <div class="taxonomy-panel">
+            <h3 class="panel-heading">Quick Facts</h3>
+            <dl id="taxonomyList" class="taxonomy-dl"></dl>
+            <div class="vernacular-block">
+              <span class="vernacular-label">Other Common Names</span>
+              <p id="commonNames" class="vernacular-list"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Overview, Photos & Other Matches -->
+        <div class="dossier-right-col">
+          <div class="monograph-block">
+            <h3 class="panel-heading">About This Plant</h3>
+            <div id="description" class="description-prose"></div>
+          </div>
+
+          <div class="reference-gallery-block">
+            <div class="panel-header-row">
+              <h3 class="panel-heading">Reference Photos</h3>
+              <span class="panel-sub">Tap any photo to enlarge</span>
+            </div>
+            <div id="similar" class="similar gallery"></div>
+          </div>
+
+          <div class="candidates-block">
+            <div class="panel-header-row">
+              <h3 class="panel-heading">Other Possible Matches</h3>
+              <span class="panel-sub">Tap a row to compare</span>
+            </div>
+            <div class="table-scroll">
+              <table class="candidates-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Common Name</th>
+                    <th>Scientific Name</th>
+                    <th>Family</th>
+                    <th class="num-col">Match</th>
+                  </tr>
+                </thead>
+                <tbody id="candidatesBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 3: Clean Personal Garden Space -->
+    <section id="personalSpaceSection" class="personal-space-section">
+      <div class="section-header-bar">
+        <div>
+          <p class="editorial-kicker">Saved on Your Device</p>
+          <h2 class="section-heading">My Garden</h2>
+          <p class="section-sub">
+            Your identified plants and care notes stay saved on your phone or computer.
+          </p>
+        </div>
+
+        <div class="folder-sync-bar">
+          <button id="exportCollectionBtn" type="button" class="btn-secondary">Save Backup</button>
+          <label for="importBundleInput" class="btn-secondary">Restore Backup</label>
+          <input id="importBundleInput" type="file" accept=".json,application/json" hidden />
+          <button id="connectFolderBtn" type="button" class="btn-secondary desktop-only-btn">Sync Desktop Folder</button>
+        </div>
+      </div>
+
+      <!-- Simple Filter & Search Bar -->
+      <div class="collection-toolbar">
+        <div class="segmented-bar" role="group" aria-label="Filter saved plants">
+          <button type="button" class="seg-btn filter-tab active" data-filter="all">All Plants</button>
+          <button type="button" class="seg-btn filter-tab" data-filter="favorites">Favorites</button>
+          <button type="button" class="seg-btn filter-tab" data-filter="with-notes">With Notes</button>
+        </div>
+
+        <div class="collection-controls">
+          <span id="vaultCountText" class="vault-inline-count">0 plants saved</span>
+          <input id="collectionSearch" type="search" class="search-input" placeholder="Search saved plants…" aria-label="Search saved plants" />
+          <button id="syncNowBtn" type="button" class="btn-secondary" hidden>Sync Now</button>
+          <button id="clearCollectionBtn" type="button" class="btn-ghost">Clear All</button>
+        </div>
+      </div>
+
+      <!-- Optional Garden Preferences Drawer -->
+      <details class="preferences-drawer">
+        <summary class="preferences-summary">
+          <span>Garden Preferences &amp; Auto-Save Settings</span>
+          <span id="folderStatusText" class="drawer-status-meta">Saved on device</span>
+        </summary>
+        <div class="preferences-panel">
+          <div class="pref-col">
+            <label for="gardenNameInput" class="control-label">Garden Name &amp; Setup</label>
+            <div class="pref-inputs-row">
+              <input id="gardenNameInput" type="text" class="search-input" placeholder="e.g., Living Room Plants" />
+              <select id="environmentSelect" class="search-input" aria-label="Growing environment">
+                <option value="Indoor Apartment">Indoor / Apartment</option>
+                <option value="Sunny Balcony / Patio">Balcony / Patio</option>
+                <option value="Backyard Garden">Backyard Garden</option>
+                <option value="Greenhouse / Conservatory">Greenhouse</option>
+              </select>
+              <select id="petPrefSelect" class="search-input" aria-label="Pet safety preference">
+                <option value="No Pets">No Pets</option>
+                <option value="Pet-Safe Priority">Have Cats or Dogs</option>
+              </select>
+            </div>
+            <div class="autosave-row">
+              <button id="autoSaveToggleBtn" type="button" class="seg-btn active" aria-pressed="true">Auto-Save ON</button>
+              <span class="control-hint">Automatically save identified photos to My Garden</span>
+            </div>
+          </div>
+
+          <div class="pref-col">
+            <span class="control-label">Favorite Plant Types</span>
+            <div id="interestsBar" class="segmented-bar interests-bar" role="group" aria-label="Select your plant interests">
+              <button type="button" class="seg-btn interest-btn active" data-interest="Houseplants">Houseplants</button>
+              <button type="button" class="seg-btn interest-btn active" data-interest="Flowers">Flowers</button>
+              <button type="button" class="seg-btn interest-btn" data-interest="Succulents & Cacti">Succulents</button>
+              <button type="button" class="seg-btn interest-btn" data-interest="Herbs & Edibles">Herbs</button>
+              <button type="button" class="seg-btn interest-btn" data-interest="Trees & Shrubs">Trees</button>
+              <button type="button" class="seg-btn interest-btn" data-interest="Medicinal Plants">Medicinal</button>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <div id="collectionGrid" class="collection-grid"></div>
+    </section>
+
+    <!-- Simple 3-Step Visual Guide -->
+    <section id="guideSection" class="guide-section">
+      <div class="section-header-bar">
+        <div>
+          <p class="editorial-kicker">Quick Guide</p>
+          <h2 class="section-heading">How It Works</h2>
+        </div>
+        <div class="folder-sync-bar">
+          <button id="sectionTipsBtn" type="button" class="btn-secondary">Quick Tips</button>
+        </div>
+      </div>
+      <div class="guide-grid">
+        <article class="guide-item">
+          <h3 class="guide-title">01. Snap or Upload</h3>
+          <p class="guide-body">
+            Tap <strong>Take Photo</strong> on your phone, pick from your gallery, or drag &amp; drop a photo on desktop.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">02. Get Care Tips</h3>
+          <p class="guide-body">
+            See the plant's name, sunlight and watering needs, pet safety, and reference photos right away.
+          </p>
+        </article>
+        <article class="guide-item">
+          <h3 class="guide-title">03. Save Your Garden</h3>
+          <p class="guide-body">
+            Your identified plants and personal notes stay saved on your phone or computer—no login needed.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Ergonomic Mobile Bottom Navigation Bar (Visible only on Mobile/Tablet screens) -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <a href="#identifier" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <path d="M20 20L16.5 16.5" stroke-linecap="round"/>
+      </svg>
+      <span>Identify</span>
+    </a>
+    <button id="mobileCameraNavBtn" type="button" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+      </svg>
+      <span>Camera</span>
+    </button>
+    <a href="#personalSpaceSection" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M12 2C7 6 5 12 7 18C9 21 12 22 12 22C12 22 15 21 17 18C19 12 17 6 12 2Z"/>
+        <path d="M12 2V22" stroke-linecap="round"/>
+      </svg>
+      <span>My Garden</span>
+    </a>
+    <button id="mobileTipsNavBtn" type="button" class="mobile-nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 16v-4M12 8h.01" stroke-linecap="round"/>
+      </svg>
+      <span>Tips</span>
+    </button>
+  </nav>
+
+  <!-- Simple Welcome Tip Screen (Opens every time the website is opened) -->
+  <div id="tipScreenModal" class="tip-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="tipModalTitle">
+    <div class="tip-modal-card">
+      <div class="tip-modal-header">
+        <div>
+          <p class="editorial-kicker">Welcome to VxPlants</p>
+          <h2 id="tipModalTitle" class="tip-modal-title">3 Quick Tips Before You Start</h2>
+        </div>
+        <button id="closeTipModalBtn" type="button" class="btn-ghost" aria-label="Close tips">✕</button>
+      </div>
+
+      <div id="tipModalBody" class="tip-modal-body">
+        <div class="simple-tips-list">
+          <div class="simple-tip-row">
+            <div class="simple-tip-num">1</div>
+            <div class="simple-tip-text">
+              <strong>Snap a Photo, Upload, or Pick a Sample</strong>
+              <p>Tap <strong>Take Photo</strong> on your phone, drop an image from your computer, or tap a sample plant.</p>
+            </div>
+          </div>
+
+          <div class="simple-tip-row">
+            <div class="simple-tip-num">2</div>
+            <div class="simple-tip-text">
+              <strong>Clear Leaf or Flower Photos Work Best</strong>
+              <p>A close-up of a single leaf or flower in good light gives the most accurate match and care guide.</p>
+            </div>
+          </div>
+
+          <div class="simple-tip-row">
+            <div class="simple-tip-num">3</div>
+            <div class="simple-tip-text">
+              <strong>Saved Privately on Your Device</strong>
+              <p>Your plants and notes save automatically in <strong>My Garden</strong> on both phone and computer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-modal-footer">
+        <button id="tryFeatureBtn" type="button" class="btn-secondary">Try a Sample Plant</button>
+        <button id="nextTipStepBtn" type="button" class="btn-primary">Got It, Let's Start</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-foot">
+    <div class="foot-inner">
+      <span>VxPlants · Powered by Pl@ntNet &amp; Wikipedia</span>
+      <span>Optimized for Mobile &amp; Desktop · No account required</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
